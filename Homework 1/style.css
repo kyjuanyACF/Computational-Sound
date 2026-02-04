@@ -1,0 +1,112 @@
+@font-face {
+    font-family: rainyhearts;
+    src: url("rainyhearts.ttf")format('truetype');
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; 
+  /* background-color: #fbd9cd; */
+  font-family: rainyhearts, sans-serif;
+  color: #ed489b;
+}
+
+P {
+    font-size: 30px;
+}
+
+#keyboard {
+  position: relative;
+  display: flex;
+  height: 200px;
+  user-select: none;
+}
+
+.key {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  font-family: monospace;
+  cursor: pointer;
+}
+
+.white {
+  width: 60px;
+  height: 200px;
+  background: #fff0f8;
+  border: 1px solid #ff69b4;
+  color: #ff69b4;
+  z-index: 1;
+}
+
+.black {
+  width: 40px;
+  height: 120px;
+  background: #ff69b4;
+  color: white;
+  margin-left: -20px;
+  margin-right: -20px;
+  z-index: 2;
+}
+
+  .hearts {
+    display: flex;
+    gap: 80px; 
+    margin-top: 20px;
+  }
+
+  .heart-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+ .heart-label {
+  color: #ed489b;
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 30px;
+  z-index: 10; 
+  position: relative;
+}
+
+  .heart-button {
+    width: 60px;
+    height: 60px;
+    background-color: #ff69b4;
+    position: relative;
+    transform: rotate(-45deg);
+    cursor: pointer;
+    transition: transform 0.1s, background-color 0.2s;
+    color: #ff69b4; /* pseudo-elements use this */
+  }
+
+  .heart-button::before,
+  .heart-button::after {
+    content: "";
+    width: 60px;
+    height: 60px;
+    background-color: currentColor; /* inherit from parent */
+    border-radius: 50%;
+    position: absolute;
+  }
+
+  .heart-button::before {
+    top: -30px;
+    left: 0;
+  }
+
+  .heart-button::after {
+    left: 30px;
+    top: 0;
+  }
+
+  .heart-button.active {
+    background-color: #ff1493;
+    color: #ff1493; /* pseudo-elements inherit */
+  }
