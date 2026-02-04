@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     window.addEventListener('keyup', keyUp, false);
 
     const pinkShades = ['#ff96cb', '#ffa5d2', '#ffb4da','#ffc3e1']; // background options
-    let waveform = 'sine'; // default waveform
+    let waveform = 'square'; // default waveform
 
     const buttons = document.querySelectorAll('.heart-button');
     buttons.forEach(btn => {
