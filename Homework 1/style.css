@@ -18,6 +18,7 @@ body {
 
 P {
     font-size: 30px;
+
 }
 
 #keyboard {
@@ -25,14 +26,19 @@ P {
   display: flex;
   height: 200px;
   user-select: none;
+  /* (60px * 14 keys) = 840px total width */
+  width: 840px; 
+  margin: 0 auto;
 }
 
 .key {
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  font-family: monospace;
+  font-family: 'rainyhearts', monospace;
   cursor: pointer;
+  box-sizing: border-box;
+  padding-bottom: 10px;
 }
 
 .white {
@@ -41,17 +47,17 @@ P {
   background: #fff0f8;
   border: 1px solid #ff69b4;
   color: #ff69b4;
-  z-index: 1;
+  z-index: 1; 
 }
 
 .black {
+  position: absolute; 
   width: 40px;
   height: 120px;
   background: #ff69b4;
   color: white;
-  margin-left: -20px;
-  margin-right: -20px;
-  z-index: 2;
+  z-index: 2; 
+  border-radius: 0 0 3px 3px;
 }
 
   .hearts {
@@ -82,8 +88,8 @@ P {
     position: relative;
     transform: rotate(-45deg);
     cursor: pointer;
-    transition: transform 0.1s, background-color 0.2s;
-    color: #ff69b4; /* pseudo-elements use this */
+    transition: background-color 0.2s;
+    color: #ff69b4; 
   }
 
   .heart-button::before,
@@ -91,7 +97,7 @@ P {
     content: "";
     width: 60px;
     height: 60px;
-    background-color: currentColor; /* inherit from parent */
+    background-color: currentColor; 
     border-radius: 50%;
     position: absolute;
   }
@@ -108,5 +114,5 @@ P {
 
   .heart-button.active {
     background-color: #ff1493;
-    color: #ff1493; /* pseudo-elements inherit */
+    color: #ff1493; 
   }
