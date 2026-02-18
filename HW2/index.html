@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>HW2</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+
+<body>
+
+  <!-- <p>Switch me on to experiment...</p>
+  <label class="switch">
+    <input type="checkbox" id="switchMode">
+    <span class="slider round"></span>
+  </label>
+
+  <div id="controls" class="hidden">
+  <label>AM Depth</label>
+  <input type="range" min="0" max="100">
+
+  <label>FM Amount</label>
+  <input type="range" min="0" max="100">
+
+  <label>Additive Mix</label>
+  <input type="range" min="0" max="100">
+</div> -->
+
+<label for="mode">Choose a mode:</label>
+<select name="mode" id="mode">
+  <option value="normal">Normal</option>
+  <option value="additive">Additive Synthesis</option>
+  <option value="AM">Amplitudde Modulation</option>
+  <option value="FM">Frequency Modulation</option>
+  <option value="fun">Have fun & experiment !!</option>
+
+</select>
+
+<p>¿ Click on the waveform you'd like to hear ¿</p>
+
+<div class="hearts">
+  <div class="heart-container">
+    <div class="heart-label">Sine</div>
+    <div class="heart-button" data-wave="sine"></div>
+  </div>
+  <div class="heart-container">
+    <div class="heart-label">Square</div>
+    <div class="heart-button" data-wave="square"></div>
+  </div>
+  <div class="heart-container">
+    <div class="heart-label">Sawtooth</div>
+    <div class="heart-button" data-wave="sawtooth"></div>
+  </div>
+</div>
+
+    <p>Press the keys to make music!!</p>
+
+<div id="keyboard">
+  <div class="key white" data-key="90">Z</div>
+  <div class="key white" data-key="88">X</div>
+  <div class="key white" data-key="67">C</div>
+  <div class="key white" data-key="86">V</div>
+  <div class="key white" data-key="66">B</div>
+  <div class="key white" data-key="78">N</div>
+  <div class="key white" data-key="77">M</div>
+
+  <div class="key white" data-key="81">Q</div>
+  <div class="key white" data-key="87">W</div>
+  <div class="key white" data-key="69">E</div>
+  <div class="key white" data-key="82">R</div>
+  <div class="key white" data-key="84">T</div>
+  <div class="key white" data-key="89">Y</div>
+  <div class="key white" data-key="85">U</div>
+
+  <div class="key black" data-key="83" style="left: 40px;">S</div>
+  <div class="key black" data-key="68" style="left: 100px;">D</div>
+  <div class="key black" data-key="71" style="left: 220px;">G</div>
+  <div class="key black" data-key="72" style="left: 280px;">H</div>
+  <div class="key black" data-key="74" style="left: 340px;">J</div>
+
+  <div class="key black" data-key="50" style="left: 460px;">2</div>
+  <div class="key black" data-key="51" style="left: 520px;">3</div>
+  <div class="key black" data-key="53" style="left: 640px;">5</div>
+  <div class="key black" data-key="54" style="left: 700px;">6</div>
+  <div class="key black" data-key="55" style="left: 760px;">7</div>
+</div>
+
+</body>
+
+
+
+
+<script src="main.js"></script>
+
+</html>
