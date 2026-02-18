@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         amFreq: 50,
         depth: 0.5,
         fmFreq: 50,
-        fmIndex: 50
+        fmIndex: 250
     };  
 
     // Array of sliders
@@ -55,6 +55,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 // Update number on screen as slider moves
                 if (id === 'depth'){
                     display.innerText = slider.value/100;
+                } else if (id == 'fmIndex'){
+                    display.innerText = slider.value * 5;
                 } else{
                     display.innerText = slider.value;
                 }
@@ -95,7 +97,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
             // note.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5); //release (ramp down to 0.01 in 0.5 secs)
 
             activeOscillators[key].gain.forEach(g => {
-                g.gain.cancelScheduledValues(audioCtx.currentTime);
+                // g.gain.cancelScheduledValues(audioCtx.currentTime);
                 g.gain.setValueAtTime(g.gain.value, audioCtx.currentTime);
                 g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.1);
             });
@@ -126,11 +128,22 @@ document.addEventListener("DOMContentLoaded", function(event) {
         gain.connect(globalGain);
 
         if (mode == 'additive'){
-            activeOscillators[key] = {oscs: [], gain: [gain]};
             osc = audioCtx.createOscillator();
             osc.frequency.value = keyboardFrequencyMap[key];
             osc.connect(gain);
+
+            lfo = audioCtx.createOscillator();
+            lfo.frequency.value = 0.5;
+
+            lfoGain = audioCtx.createGain();
+            lfoGain.gain.value = 8;
+            lfo.connect(lfoGain).connect(osc.frequency);
+            lfo.connect(gain);
+            lfo.start();
+
             osc.start();
+
+            activeOscillators[key] = {oscs: [osc, lfo], gain: [gain, lfoGain]};
 
             for (var i = 1; i <= synthSettings.partials; i++){
                 partialOsc = audioCtx.createOscillator();
@@ -177,7 +190,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
             depth.gain.value = synthSettings.depth/100;
             modulatorGain.gain.value = 1.0 - depth.gain.value;
 
-            modulatorFreq.connect(depth).connect(modulatorGain.gain); //.connect is additive, so with [-0.5,0.5] and 0.5, the modulated signal now has output gain at [0,1]
+            modulatorFreq.connect(depth).connect(modulatorGain.gain); 
             carrier.connect(modulatorGain)
             modulatorGain.connect(gain);
             
@@ -191,7 +204,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
             modFreq = audioCtx.createOscillator();
 
             modIndex = audioCtx.createGain();
-            modIndex.gain.value = synthSettings.fmIndex;
+            modIndex.gain.value = synthSettings.fmIndex * 5;
             // modIndex.gain.setValueAtTime(0.0002, audioCtx.currentTime);
             // modIndex.gain.linearRampToValueAtTime(synthSettings.fmIndex, audioCtx.currentTime + 0.02)
 
