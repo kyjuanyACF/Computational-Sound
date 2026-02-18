@@ -23,6 +23,46 @@ label{
   font-size: 14px;
 }
 
+#project-nav {
+  background-color: #fff0f6;
+  padding: 10px 0;
+  border-bottom: 2px solid #ffc3e1;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+.nav-title {
+  color: #ff96cb;
+  font-weight: bold;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #ff96cb;
+  padding: 5px 15px;
+  border: 2px solid #ffc3e1;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+  background-color: #ffc3e1;
+  color: white;
+}
+
+/* .nav-link.active {
+  background-color: #ff96cb;
+  color: white;
+  border-color: #ff96cb;
+} */
+
 select {
   background-color: #ffd8ed;
   color: #c81264;
