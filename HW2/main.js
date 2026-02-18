@@ -31,17 +31,50 @@ document.addEventListener("DOMContentLoaded", function(event) {
     window.addEventListener('keydown', keyDown, false);
     window.addEventListener('keyup', keyUp, false);
 
-    const pinkShades = ['#ff96cb', '#ffa5d2', '#ffb4da','#ffc3e1']; // background options
+    const pinkShades = ['#ffafd7','#ffe1f0']; // background options
     let waveform = 'sine'; // default waveform
 
-    // const switchToggle = document.getElementById("switchMode");
-    // const controls = document.getElementById("controls");
+    // Initial settings for the synth engine
+    let synthSettings = {
+        partials: 5,
+        amFreq: 50,
+        depth: 0.5,
+        fmFreq: 50,
+        fmIndex: 50
+    };  
 
-    // function updateControls(){
-    //     controls.classList.toggle("hidden", !switchToggle.checked);
-    // }
+    // Array of sliders
+    const sliders = ['partials', 'amFreq', 'depth', 'fmFreq', 'fmIndex'];
 
-    // switchToggle.addEventListener("change", updateControls);
+    sliders.forEach(id => {
+        const slider = document.getElementById(id);
+        const display = document.getElementById(id + 'Val');
+
+        if (slider && display) {
+            slider.addEventListener('input', () => {
+                // Update number on screen as slider moves
+                if (id === 'depth'){
+                    display.innerText = slider.value/100;
+                } else{
+                    display.innerText = slider.value;
+                }
+                //update slider value in synthSettings
+                synthSettings[id] = parseInt(slider.value);
+            });
+
+            // Initialize nums on page load
+            display.innerText = slider.value;
+        }
+    });
+
+    const buttons = document.querySelectorAll('.heart-button');
+    buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            waveform = btn.dataset.wave;
+            buttons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        });
+    });
 
     activeOscillators = {}
 
@@ -62,12 +95,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
             // note.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5); //release (ramp down to 0.01 in 0.5 secs)
 
             activeOscillators[key].gain.forEach(g => {
+                g.gain.cancelScheduledValues(audioCtx.currentTime);
                 g.gain.setValueAtTime(g.gain.value, audioCtx.currentTime);
-                g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.5);
+                g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.1);
             });
 
             if (activeOscillators[key].oscs){
-                activeOscillators[key].oscs.forEach(o => o.stop(audioCtx.currentTime + 0.6));
+                activeOscillators[key].oscs.forEach(o => o.stop(audioCtx.currentTime + 0.15));
             }
             // activeOscillators[key].osc.stop(audioCtx.currentTime + 0.5); //stop oscillator after release (0.5)
             // activeOscillators[key].osc1.stop(audioCtx.currentTime + 0.5);
@@ -86,12 +120,27 @@ document.addEventListener("DOMContentLoaded", function(event) {
         gain.gain.exponentialRampToValueAtTime(0.1, audioCtx.currentTime + 0.1); //attack
 
         const globalGain = audioCtx.createGain();
-        globalGain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        globalGain.gain.setValueAtTime(0.5, audioCtx.currentTime);
         globalGain.connect(audioCtx.destination);
 
         gain.connect(globalGain);
 
         if (mode == 'additive'){
+            activeOscillators[key] = {oscs: [], gain: [gain]};
+            osc = audioCtx.createOscillator();
+            osc.frequency.value = keyboardFrequencyMap[key];
+            osc.connect(gain);
+            osc.start();
+
+            for (var i = 1; i <= synthSettings.partials; i++){
+                partialOsc = audioCtx.createOscillator();
+                partialOsc.frequency.value = (i++ * keyboardFrequencyMap[key]) + Math.random() * 15;
+                partialOsc.connect(gain);
+                partialOsc.start();
+                activeOscillators[key].oscs.push(partialOsc);
+            }
+            
+            /*
             //additive synthesis - adding oscilators at diff frequencies
             // osc = audioCtx.createOscillator();
             osc1 = audioCtx.createOscillator();
@@ -114,22 +163,23 @@ document.addEventListener("DOMContentLoaded", function(event) {
             osc3.start();
             osc4.start();
             activeOscillators[key] = {oscs: [osc1, osc2, osc3, osc4], gain: [gain] };
+            */
 
         } else if (mode === 'AM') {
             carrier = audioCtx.createOscillator();
             carrier.type = waveform;
             modulatorFreq = audioCtx.createOscillator();
-            modulatorFreq.frequency.value = 30;
+            modulatorFreq.frequency.value = synthSettings.amFreq;
             carrier.frequency.value = keyboardFrequencyMap[key];
 
             modulatorGain = audioCtx.createGain();
             depth = audioCtx.createGain();
-            depth.gain.value = 0.5;
+            depth.gain.value = synthSettings.depth/100;
             modulatorGain.gain.value = 1.0 - depth.gain.value;
 
             modulatorFreq.connect(depth).connect(modulatorGain.gain); //.connect is additive, so with [-0.5,0.5] and 0.5, the modulated signal now has output gain at [0,1]
             carrier.connect(modulatorGain)
-            modulatorGain.connect(globalGain);
+            modulatorGain.connect(gain);
             
             carrier.start();
             modulatorFreq.start();
@@ -141,13 +191,16 @@ document.addEventListener("DOMContentLoaded", function(event) {
             modFreq = audioCtx.createOscillator();
 
             modIndex = audioCtx.createGain();
-            modIndex.gain.value = 60;
-            modFreq.frequency.value = 20;
+            modIndex.gain.value = synthSettings.fmIndex;
+            // modIndex.gain.setValueAtTime(0.0002, audioCtx.currentTime);
+            // modIndex.gain.linearRampToValueAtTime(synthSettings.fmIndex, audioCtx.currentTime + 0.02)
+
+            modFreq.frequency.value = synthSettings.fmFreq;
 
             modFreq.connect(modIndex);
             modIndex.connect(fmCarrier.frequency);
 
-            fmCarrier.connect(globalGain);
+            fmCarrier.connect(gain);
 
             fmCarrier.start();
             modFreq.start();

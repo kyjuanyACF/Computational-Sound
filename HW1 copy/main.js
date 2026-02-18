@@ -77,10 +77,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
         const gain = audioCtx.createGain();
         gain.gain.setValueAtTime(0.01, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.1, audioCtx.currentTime + 0.1); //attack
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1); //attack
 
         const globalGain = audioCtx.createGain();
-        globalGain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+        globalGain.gain.setValueAtTime(0.2, audioCtx.currentTime);
 
         gain.connect(globalGain);
         globalGain.connect(audioCtx.destination);
