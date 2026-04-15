@@ -3,66 +3,23 @@
 
 <head>
     <meta charset="utf-8">
-    <title>HW2</title>
+    <title>HW1</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
-
 <body>
 
-  <nav id="project-nav">
+<nav id="project-nav">
   <div class="nav-container">
     <span class="nav-title">Select Project:</span>
-    <a href="../HW1/index.html" class="nav-link active">HW1: Build Your Own Keyboard</a>
-    <a href="../HW2/index.html" class="nav-link">HW2: Build Your Own Synth</a>
+    <a href="./hw1.html" class="nav-link active">HW1: Build Your Own Keyboard</a>
+    <a href="../HW2/hw2.html" class="nav-link">HW2: Build Your Own Synth</a>
+    <a href="../HW3/part2.html" class="nav-link">HW3: Farnell Synthesis</a>
+
   </div>
   </nav>
 
-  <!-- <br><br> -->
-  <h2>Choose a mode:</h2>
-  <select name="mode" id="mode">
-    <option value="normal">Normal</option>
-    <option value="additive">Additive Synthesis (w. LFO)</option>
-    <option value="AM">Amplitudde Modulation</option>
-    <option value="FM">Frequency Modulation</option>
-    <option value="fun">Have fun & experiment !!</option>
-
-  </select>
-
-  <!-- <p>Switch me on to experiment...</p>
-  <label class="switch">
-    <input type="checkbox" id="switchMode">
-    <span class="slider round"></span>
-  </label> -->
-
-<div id="controls">
-  <div class="control-group">
-    <label># of Partials: <span id="partialsVal">5</span></label>
-    <input type="range" id="partials" min="1" max="10" value="5">
-  </div>
-
-  <div class="control-group">
-    <label>AM Modulator Freq: <span id="amFreqVal">5</span></label>
-    <input type="range" id="amFreq" min="1" max="100" value="50">
-  </div>
-
-   <div class="control-group">
-    <label>AM Depth: <span id="depthVal">5</span></label>
-    <input type="range" id="depth" min="1" max="100" value="50">
-  </div>
-
-  <div class="control-group">
-    <label>FM Modulator Freq: <span id="fmFreqVal">5</span></label>
-    <input type="range" id="fmFreq" min="1" max="100" value="50">
-  </div>
-
-  <div class="control-group">
-    <label>FM Index of Modulation: <span id="fmIndexVal">5</span></label>
-    <input type="range" id="fmIndex" min="1" max="100" value="50">
-  </div>
-</div>
-
-<p>¿ Click on the waveform you'd like to hear ¿</p>
+<p>¿Click on the waveform you'd like to hear ¿</p>
 
 <div class="hearts">
   <div class="heart-container">
@@ -112,9 +69,6 @@
 </div>
 
 </body>
-
-
-
 
 <script src="main.js"></script>
 

@@ -1,0 +1,107 @@
+@font-face {
+    font-family: rainyhearts;
+    src: url("rainyhearts.ttf")format('truetype');
+}
+
+body {
+    margin: 0;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: rainyhearts;
+    cursor: crosshair;
+    background-color: #000627;
+
+}
+
+#directions {
+    text-align: center;
+    pointer-events: none;
+    /* let clicks pass through to the body */
+    transition: opacity 1s ease;
+    z-index: 10;
+}
+
+p {
+    font-style: italic;
+    font-size: 30px;
+    color: rgba(201, 233, 255, 0.8);
+
+}
+
+.drop {
+    position: absolute;
+    width: 2px;
+    height: 25px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.8));
+    border-radius: 1px;
+    z-index: 5;
+}
+
+.ripple {
+    position: absolute;
+    border: 1.5px solid rgba(174, 194, 224, 0.5);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    animation: ripple-out 1.2s cubic-bezier(0, 0.5, 0.5, 1) forwards;
+}
+
+@keyframes ripple-out {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+        border-width: 2px;
+    }
+    100% {
+        width: 250px;
+        height: 60px;
+        opacity: 0;
+        border-width: 0.5px;
+    }
+}
+
+/* navigation */
+#project-nav {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 100px; /* Fixed width for the vertical list */
+    z-index: 100;
+    padding: 20px;
+    image-rendering: pixelated;
+}
+
+.nav-container {
+    display: flex;
+    flex-direction: column; 
+    gap: 15px; 
+    align-items: flex-start; 
+}
+
+.nav-link {
+    color: rgba(201, 233, 255, 0.7);
+    text-decoration: none;
+    font-size: 20px;
+    width: 100%;
+    padding: 8px 5px;
+    transition: all 0.2s steps(2);
+}
+
+.nav-link:hover {
+    color: #ffffff;
+    background-color: #5dade2;
+    padding-left: 15px;
+}
+
+.nav-link.active {
+    color: #5dade2;
+    font-weight: bold;
+}
+
+.nav-link.active::before {
+    content: "> ";
+}

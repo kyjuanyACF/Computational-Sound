@@ -1,0 +1,110 @@
+@font-face {
+    font-family: rainyhearts;
+    src: url("../rainyhearts.ttf")format('truetype');
+}
+
+body {
+    font-family: rainyhearts;
+    font-family: rainyhearts;
+    cursor: crosshair;
+    background-color: #000627;
+}
+
+#project-nav {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+    padding: 20px;
+    width: 100px;
+}
+
+.nav-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; 
+    align-items: flex-start; 
+}
+
+.nav-link {
+    color: rgba(201, 233, 255, 0.7);
+    text-decoration: none;
+    font-size: 20px;
+    width: 100%;
+    padding: 8px 5px;
+    transition: all 0.2s steps(2);
+}
+
+.nav-link:hover {
+    color: #ffffff;
+    background-color: #5dade2;
+    padding-left: 15px; 
+}
+
+.nav-link.active {
+    color: #5dade2;
+    font-weight: bold;
+}
+
+.nav-link.active::before {
+    content: "> ";
+}
+
+#part-1-container {
+    margin-left: 150px; 
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+button {
+    font-family: 'rainyhearts', sans-serif;
+    font-size: 28px;
+    background-color: #5dade2;
+    color: #000627;
+    border: none;
+    padding: 10px 30px;
+    cursor: pointer;
+    /* The "3D" depth shadow */
+    box-shadow: 0 6px 0 #2e86c1; 
+    position: relative;
+    image-rendering: pixelated;
+    transition: all 0.1s;
+}
+
+button:hover {
+    background-color: #85c1e9;
+    box-shadow: 0 6px 0 #5dade2;
+}
+
+button:active {
+    /* Moves the button down to simulate a click */
+    top: 4px;
+    box-shadow: 0 2px 0 #2e86c1;
+}
+
+.code-box {
+    background: rgba(201, 233, 255, 0.05);
+    border: 2px solid #5dade2;
+    padding: 20px;
+    position: relative;
+    margin-top: 10px;
+}
+
+.code-box h3 {
+    margin-top: -35px;
+    background: #000627;
+    display: inline-block;
+    padding: 0 10px;
+    color: #5dade2;
+    font-size: 20px;
+}
+
+pre {
+    color: rgba(201, 233, 255, 0.8);
+    font-family: 'Courier New', monospace; /* Monospace is better for code */
+    font-size: 16px;
+    line-height: 1.4;
+    overflow-x: auto;
+}
