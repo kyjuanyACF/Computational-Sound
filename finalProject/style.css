@@ -86,11 +86,15 @@ body {
 
 #left-col { display: flex; flex-direction: column; gap: 12px; }
 
+/* canvas-wrap must be positioned so the overlay can sit on top */
 #canvas-wrap {
+  position: relative;
+  display: inline-block;
   border: 2.5px solid #333;
   background: #fff;
   cursor: crosshair;
   box-shadow: 4px 4px 0 #ccc;
+  line-height: 0;  /* prevent inline spacing gap below canvas */
 }
 
 #drawCanvas {
@@ -99,7 +103,15 @@ body {
   user-select: none;
 }
 
-#action-row, #playback-row { display: flex; gap: 10px; align-items: center; }
+/* Grid overlay sits on top of drawCanvas; pointer-events off so drawing works */
+#gridOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+#action-row { display: flex; gap: 10px; align-items: center; }
 
 /* ── Center col (tools) ──────────────────────────────────────────────────── */
 #center-col {
@@ -110,9 +122,12 @@ body {
   padding-top: 6px;
 }
 
-#tool-list { display: flex; flex-direction: column; gap: 8px; }
+/* ── Brush size buttons ──────────────────────────────────────────────────── */
+.section-label { font-size: 0.9rem; color: #555; margin-bottom: -8px; }
 
-.tool-btn {
+#size-btns { display: flex; flex-direction: column; gap: 6px; }
+
+.size-btn {
   padding: 9px 14px;
   border: 2px solid #bbb;
   background: #fff;
@@ -123,8 +138,8 @@ body {
   box-shadow: 2px 2px 0 #ccc;
   transition: border-color 0.1s, background 0.1s;
 }
-.tool-btn:hover { border-color: #888; }
-.tool-btn.active { border-color: #222; background: #ececec; box-shadow: 1px 1px 0 #aaa; }
+.size-btn:hover { border-color: #888; }
+.size-btn.active { border-color: #222; background: #ececec; box-shadow: 1px 1px 0 #aaa; }
 
 #eraseBtn {
   padding: 9px 14px;
@@ -166,7 +181,7 @@ button {
 button:hover { background: #ececec; }
 button:active { box-shadow: none; transform: translate(1px, 1px); }
 
-#playBtn.playing, #playBtn2.playing {
+#playBtn.playing {
   background: #111;
   color: #fff;
   border-color: #111;
@@ -180,14 +195,12 @@ button:active { box-shadow: none; transform: translate(1px, 1px); }
   gap: 16px;
 }
 
-/* Scale the ASCII canvas up so chars are large and legible */
+/* ASCII canvas is native 960×720; CSS scales it to fit the viewport */
 #asciiCanvas {
   display: block;
   border: 2.5px solid #333;
   box-shadow: 4px 4px 0 #aaa;
   background: #fff;
-  image-rendering: pixelated;
-  /* 2× the source canvas size — chars become ~14px, easy to read */
   width: min(960px, 95vw);
   height: auto;
   aspect-ratio: 4 / 3;
@@ -201,9 +214,7 @@ button:active { box-shadow: none; transform: translate(1px, 1px); }
   justify-content: center;
 }
 
-#listen-controls .ctrl-group {
-  min-width: 180px;
-}
+#listen-controls .ctrl-group { min-width: 180px; }
 
 .listen-hint {
   font-size: 0.85rem;
