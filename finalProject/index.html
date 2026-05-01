@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tittle</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <nav id="project-nav">
+    <div class="nav-container">
+      <a href="index.html" class="nav-link active">Project</a>
+      <a href="" class="nav-link">Presentation</a>
+      <a href="./writeup/writeup.html" class="nav-link">Writeup</a>
+    </div>
+  </nav>
+
+  <h1 class="app-title">Tittle</h1>
+
+  <div id="layout">
+
+    <!-- Left: drawing canvas -->
+    <div id="left-col">
+      <div id="canvas-wrap">
+        <canvas id="drawCanvas"></canvas>
+      </div>
+      <div id="action-row">
+        <button id="uploadBtn">Upload</button>
+        <button id="clearBtn">Clear</button>
+        <input type="file" id="fileInput" accept="image/*" hidden>
+      </div>
+      <div id="playback-row">
+        <button id="playBtn">&#9654; Play</button>
+        <button id="shareBtn">Share</button>
+      </div>
+    </div>
+
+    <!-- Center: tools -->
+    <div id="center-col">
+      <div id="tool-list">
+        <button class="tool-btn active" data-tool="pencil">&#9998; Pencil</button>
+        <button class="tool-btn" data-tool="pen">&#128394; Pen</button>
+        <button class="tool-btn" data-tool="marker">&#9644; Marker</button>
+        <button class="tool-btn" data-tool="brush">&#9643; Brush</button>
+      </div>
+
+      <button id="eraseBtn">[ ERASE ]</button>
+
+      <div class="ctrl-group">
+        <label>Brush size:</label>
+        <input type="range" id="brushSize" min="1" max="40" value="6">
+      </div>
+
+      <div class="ctrl-group">
+        <label>Color:</label>
+        <input type="color" id="colorPicker" value="#000000">
+      </div>
+
+      <div class="ctrl-group">
+        <label>Speed:</label>
+        <input type="range" id="tempoSlider" min="40" max="350" value="110">
+        <span class="ctrl-hint">slow &#8594; fast</span>
+      </div>
+    </div>
+
+    <!-- Right: ASCII "score" -->
+    <div id="right-col">
+      <h2>Listen:</h2>
+      <div id="ascii-display"></div>
+      <p class="listen-hint">When it hits a char, the char changes color in rainbow order</p>
+    </div>
+
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
