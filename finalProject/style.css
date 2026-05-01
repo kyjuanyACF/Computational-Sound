@@ -202,31 +202,15 @@ button:active { box-shadow: none; transform: translate(1px, 1px); }
   padding-bottom: 4px;
 }
 
-#ascii-display {
-  font-family: 'Courier New', Courier, monospace;
-  font-size: 10px;
-  line-height: 10px;
-  letter-spacing: 1.5px;
-  background: #0d0d0d;
-  color: #888;
-  padding: 10px 8px;
-  border-radius: 4px;
-  overflow: auto;
-  border: 2px solid #333;
-  box-shadow: 4px 4px 0 #aaa;
-  min-height: 200px;
-  max-height: 480px;
-}
-
-.ascii-row {
+/* ASCII canvas — same visual size as the drawing canvas so they align 1-to-1 */
+#asciiCanvas {
   display: block;
-  white-space: nowrap;
-}
-
-/* scanner column highlight */
-.scanner-col {
-  background: rgba(255, 255, 80, 0.25);
-  border-radius: 1px;
+  border: 2.5px solid #333;
+  box-shadow: 4px 4px 0 #aaa;
+  /* Scale to match the drawing canvas display size via CSS width */
+  width: 480px;
+  height: 360px;
+  image-rendering: pixelated;
 }
 
 .listen-hint {
