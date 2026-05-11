@@ -368,14 +368,6 @@
       line-height: 1.75;
       color: #2c2518;
       background: #faf7ee;
-      background-image: repeating-linear-gradient(
-        to bottom,
-        transparent 0px,
-        transparent 27px,
-        #c4d4e4 27px,
-        #c4d4e4 28px
-      );
-      background-position: 0 48px;
     }
 
     .prose-panel h1 {
@@ -612,11 +604,11 @@
     <!-- ── Proposal Tab ── -->
     <div class="tab-panel" id="panel-proposal">
       <div class="prose-panel">
-        <h1>Musical Canvas</h1>
-        <p class="meta">Final Project Proposal &nbsp;|&nbsp; WebAudio &nbsp;|&nbsp; Digital Signal Processing</p>
+        <h1>Final Project Proposal</h1>
         
-        <p>blah</p>
+        <p>This project is a web-based drawing tool where users can sketch on a canvas and immediately hear their artwork turn into music as they draw. The idea is to connect visual expression with sound in real time, so every stroke contributes to an evolving audio output. Different drawing features, like speed, direction, shape, color, and density of strokes will be mapped to musical properties such as pitch, rhythm, volume, instrument timbre, and texture. For example, faster strokes could create faster rhythms, sharper angles might trigger more percussive sounds, and smoother curves could produce more sustained tones. The goal is to make drawing feel more interactive and playful, where users don’t just create something visual but also hear it develop live as part of the creative process.</p>
         
+        <p>On the technical side, the project will run in the browser using a canvas-based drawing interface paired with the Web Audio API for sound generation. A mapping system will continuously track user input from the canvas and translate it into real-time audio signals, allowing the sound to evolve fluidly as the drawing changes. I also plan to use at least one synthesis technique we covered in class, such as FM synthesis or a gain-controlled modulation setup, to shape the sound generation in a more expressive way. To make the experience more flexible, I also want to include a few selectable “sound modes” or palettes (for example, ambient, electronic, or percussive) that change how drawing gestures are interpreted musically. The final result should be an interactive creative tool that feels immediate and responsive, and that encourages users to explore the relationship between visual art and sound in an intuitive way.</p>
       </div>
     </div>
 
@@ -638,8 +630,11 @@
         <h1>Writeup</h1>
         <p class="meta">Musical Canvas | Computational Sound Final Project</p>
 
-        <p>blah</p>
+        <p>Musical Canvas is an interactive web-based drawing tool that turns sketches into real-time generative music. As users draw on the canvas, their gestures are continuously translated into sound, creating a direct link between visual motion and audio output. Each stroke becomes both a visual mark and a musical event, so drawing feels more like performing music than just creating an image. The goal is to make an intuitive system where users can explore sound through simple drawing actions without needing any musical training.</p>
 
+        <p>The project is built using an HTML5 canvas with a layered setup: one layer for a ruled-paper background and another for dynamic strokes. Each stroke is tracked as a sequence of pointer events with timing information, allowing both live synthesis and replay. The audio engine is built with the Web Audio API using an FM synthesis structure, where each stroke triggers a voice made of a carrier and modulator oscillator. Drawing position controls pitch and modulation depth, while velocity affects attack time, and a convolver adds reverb for spatial depth. Additional controls like brush size, FM ratio, and decay give users real-time control over both sound and interaction style.</p>
+
+        <p>A key part of the system is the visual-to-audio mapping. Horizontal movement affects pitch and color hue, vertical movement changes modulation intensity and brightness, and stroke dynamics influence envelope behavior. The interface also includes an auto mode that generates color based on sound parameters and a manual mode for user-defined color input. A replay system reconstructs both the drawing and its corresponding audio performance, turning the canvas into a kind of playable recording. Overall, the project explores drawing as a form of live musical expression through direct gesture-to-sound synthesis.</p>
       </div>
     </div>
 
@@ -649,11 +644,10 @@
 <script>
 'use strict';
 
-// ── Constants 
+// ── Constants
 const MAX_VOICES = 8;
 const FREQ_MIN   = 100;
 const FREQ_MAX   = 2000;
-const LINE_GAP   = 28;
 const BG_COLOR   = '#faf7ee';
 
 // ── AudioEngine 
@@ -772,14 +766,6 @@ const BgCanvas = (() => {
   function draw() {
     ctx.fillStyle = BG_COLOR;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = '#c4d4e4';
-    ctx.lineWidth   = 0.8;
-    for (let y = LINE_GAP; y < canvas.height; y += LINE_GAP) {
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(canvas.width, y);
-      ctx.stroke();
-    }
   }
 
   function resize(w, h) {
