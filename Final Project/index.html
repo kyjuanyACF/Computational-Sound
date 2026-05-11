@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chromesthetic Canvas</title>
+  <style>
+    @font-face {
+      font-family: 'RainyHearts';
+      src: url('rainyhearts.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #c8bfa8;
+      background-image:
+        radial-gradient(ellipse at 20% 50%, #d4cab2 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, #bfb5a0 0%, transparent 50%);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 24px 20px;
+      font-family: 'RainyHearts', cursive;
+    }
+
+    /* ── Notebook shell ── */
+    .notebook {
+      display: flex;
+      width: min(1040px, 100%);
+      height: calc(100vh - 48px);
+      min-height: 600px;
+      background: #faf7ee;
+      border-radius: 3px 5px 5px 3px;
+      box-shadow:
+        inset -1px 0 0 rgba(0,0,0,.04),
+        2px 2px 0 #b0a590,
+        5px 5px 0 #9c9280,
+        8px 8px 0 #8a8070,
+        0 16px 48px rgba(0,0,0,.35);
+    }
+
+    /* ── Binding ── */
+    .binding {
+      width: 48px;
+      flex-shrink: 0;
+      background: linear-gradient(160deg, #7a5c3a 0%, #9e7a52 40%, #7a5c3a 100%);
+      border-radius: 3px 0 0 3px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .binding::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 18px; bottom: 0;
+      width: 3px;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px, transparent 10px,
+        rgba(0,0,0,.25) 10px, rgba(0,0,0,.25) 13px
+      );
+    }
+
+    .hole {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 35%, #e8dfc8, #c4bba8);
+      box-shadow: inset 0 2px 5px rgba(0,0,0,.45), 0 1px 1px rgba(255,255,255,.2);
+      border: 1px solid #a09080;
+      margin: 32px 0;
+      flex-shrink: 0;
+    }
+
+    /* ── Page ── */
+    .page {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .page-header {
+      padding: 18px 28px 14px;
+      border-bottom: 2px solid #e0d4b8;
+      background: #faf7ee;
+      flex-shrink: 0;
+    }
+
+    .page-title    { font-size: 30px; font-weight: 700; color: #2c2518; line-height: 1; }
+    .page-subtitle { font-size: 15px; color: #7a6848; font-style: italic; margin-top: 3px; }
+
+    /* ── Workspace ── */
+    .workspace {
+      flex: 1;
+      display: flex;
+      min-height: 0;
+    }
+
+    /* ── Margin controls ── */
+    .margin-controls {
+      width: 168px;
+      flex-shrink: 0;
+      padding: 12px 10px 12px 14px;
+      border-right: 2px solid #d88080;
+      background: #faf7ee;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow-y: auto;
+    }
+
+    /* Tool buttons */
+    .tool-row {
+      display: flex;
+      gap: 6px;
+    }
+
+    .tool-btn {
+      flex: 1;
+      font-family: 'RainyHearts', cursive;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 4px 0;
+      border: 1.5px solid #b0a080;
+      border-radius: 4px;
+      background: #f4f0e4;
+      color: #5a4a30;
+      cursor: pointer;
+      text-align: center;
+      transition: background 0.12s, border-color 0.12s;
+      user-select: none;
+    }
+
+    .tool-btn.active {
+      background: #e8ddc8;
+      border-color: #7a5c3a;
+      color: #2c1a08;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,.12);
+    }
+
+    /* Divider */
+    .ctrl-divider {
+      border: none;
+      border-top: 1px dashed #d8ccb0;
+      margin: 0;
+    }
+
+    .ctrl-group { display: flex; flex-direction: column; gap: 3px; }
+
+    .ctrl-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #5a4a30;
+    }
+
+    .ctrl-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .ctrl-val { font-size: 11px; color: #9a8060; }
+
+    input[type="range"] {
+      width: 100%;
+      height: 3px;
+      accent-color: #7a5c3a;
+      cursor: pointer;
+    }
+
+    /* Color mode toggle */
+    .color-mode-row {
+      display: flex;
+      gap: 5px;
+    }
+
+    .color-mode-btn {
+      flex: 1;
+      font-family: 'RainyHearts', cursive;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 0;
+      border: 1.5px solid #b0a080;
+      border-radius: 3px;
+      background: #f4f0e4;
+      color: #5a4a30;
+      cursor: pointer;
+      text-align: center;
+      transition: background 0.12s;
+      user-select: none;
+    }
+
+    .color-mode-btn.active {
+      background: #e8ddc8;
+      border-color: #7a5c3a;
+    }
+
+    .color-picker-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 2px;
+    }
+
+    input[type="color"] {
+      width: 32px;
+      height: 22px;
+      border: 1.5px solid #b0a080;
+      border-radius: 3px;
+      padding: 1px;
+      background: #faf7ee;
+      cursor: pointer;
+    }
+
+    .color-swatch {
+      flex: 1;
+      height: 22px;
+      border-radius: 3px;
+      border: 1px solid #d0c4b0;
+    }
+
+    .margin-legend {
+      font-size: 10.5px;
+      color: #a09070;
+      font-style: italic;
+      line-height: 1.9;
+    }
+
+    /* ── Canvas area ── */
+    .canvas-wrap {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .canvas-wrap canvas {
+      position: absolute;
+      top: 0; left: 0;
+      display: block;
+    }
+
+    #bg-canvas   { z-index: 0; pointer-events: none; }
+    #draw-canvas { z-index: 1; cursor: crosshair; touch-action: none; user-select: none; }
+
+    /* Amp meter */
+    .amp-meter {
+      position: absolute;
+      top: 10px; right: 10px;
+      z-index: 2;
+      width: 7px; height: 56px;
+      background: #e4dcc8;
+      border-radius: 3px;
+      overflow: hidden;
+      border: 1px solid #ccc4b0;
+      pointer-events: none;
+    }
+
+    .amp-fill {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: linear-gradient(to top, #8b5c2a, #d4905a);
+      transition: height 60ms linear;
+    }
+
+    /* ── Transport ── */
+    .transport {
+      flex-shrink: 0;
+      padding: 10px 20px;
+      border-top: 1px solid #e0d4b8;
+      background: #f4f0e4;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    button {
+      font-family: 'RainyHearts', cursive;
+      font-size: 17px;
+      font-weight: 600;
+      padding: 4px 16px 5px;
+      border: 1.5px solid #9a7a50;
+      border-radius: 4px;
+      background: #faf7ee;
+      color: #2c2518;
+      cursor: pointer;
+      transition: background 0.12s, box-shadow 0.12s;
+      box-shadow: 1px 1px 0 #c4b898;
+    }
+
+    button:hover:not(:disabled)  { background: #f0e8d4; }
+    button:active:not(:disabled) { background: #e8dcc8; box-shadow: none; transform: translate(1px,1px); }
+    button:disabled { opacity: 0.38; cursor: default; }
+
+    #btn-replay { border-color: #507050; color: #204020; }
+    #btn-replay:hover:not(:disabled) { background: #e8f0e0; }
+
+    .status      { font-size: 14px; color: #8a7050; font-style: italic; margin-left: auto; }
+    .stroke-tally { font-size: 12px; color: #b09870; }
+
+    /* ── Tab bar ── */
+    .tab-bar {
+      display: flex;
+      gap: 0;
+      padding: 0 0 0 20px;
+      border-bottom: 2px solid #e0d4b8;
+      background: #ede8db;
+      flex-shrink: 0;
+    }
+
+    .tab {
+      font-family: 'RainyHearts', cursive;
+      font-size: 16px;
+      font-weight: 600;
+      padding: 8px 20px 7px;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      border-bottom: none;
+      border-radius: 5px 5px 0 0;
+      margin-bottom: -2px;
+      color: #7a6848;
+      background: transparent;
+      transition: background 0.12s, color 0.12s;
+      user-select: none;
+      position: relative;
+    }
+
+    .tab:hover:not(.active) { background: #f0ead8; color: #4a3820; }
+
+    .tab.active {
+      background: #faf7ee;
+      color: #2c1a08;
+      border-color: #e0d4b8;
+    }
+
+    /* Colored accent strip on each tab */
+    .tab::before {
+      content: '';
+      position: absolute;
+      top: 3px; left: 6px; right: 6px;
+      height: 3px;
+      border-radius: 2px;
+      opacity: 0.7;
+    }
+    .tab[data-tab="canvas"]::before       { background: #c8a87a; }
+    .tab[data-tab="proposal"]::before     { background: #8ab4d8; }
+    .tab[data-tab="presentation"]::before { background: #a898d0; }
+    .tab[data-tab="writeup"]::before      { background: #88c098; }
+
+    /* ── Tab panels ── */
+    .tab-panel { display: none; flex: 1; flex-direction: column; min-height: 0; }
+    .tab-panel.active { display: flex; }
+
+    /* ── Prose panels (proposal / writeup) ── */
+    .prose-panel {
+      flex: 1;
+      overflow-y: auto;
+      padding: 32px 48px 40px 60px;
+      line-height: 1.75;
+      color: #2c2518;
+      background: #faf7ee;
+      background-image: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 27px,
+        #c4d4e4 27px,
+        #c4d4e4 28px
+      );
+      background-position: 0 48px;
+    }
+
+    .prose-panel h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #2c1a08;
+      margin-bottom: 6px;
+      line-height: 1.2;
+      background: #faf7ee;
+      display: inline-block;
+      padding-right: 8px;
+    }
+
+    .prose-panel h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #4a3418;
+      margin: 24px 0 4px;
+      background: #faf7ee;
+      display: inline-block;
+      padding-right: 8px;
+    }
+
+    .prose-panel p {
+      font-size: 16px;
+      margin-bottom: 8px;
+      background: transparent;
+    }
+
+    .prose-panel .meta {
+      font-size: 14px;
+      color: #9a8060;
+      font-style: italic;
+      margin-bottom: 20px;
+    }
+
+    /* Proposal mapping table */
+    .prose-panel table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin: 12px 0 16px;
+      background: rgba(250,247,238,0.9);
+    }
+
+    .prose-panel th {
+      background: #e8ddc8;
+      padding: 6px 10px;
+      text-align: left;
+      font-weight: 700;
+      border: 1px solid #d0c4a8;
+      font-size: 13px;
+    }
+
+    .prose-panel td {
+      padding: 5px 10px;
+      border: 1px solid #d8ccb4;
+      vertical-align: top;
+    }
+
+    .prose-panel tr:nth-child(even) td { background: rgba(232,221,200,0.3); }
+
+    .prose-panel ul {
+      margin: 4px 0 8px 24px;
+      font-size: 16px;
+    }
+
+    .prose-panel li { margin-bottom: 2px; }
+
+    .prose-panel .signal-chain {
+      font-size: 13px;
+      font-family: monospace;
+      background: rgba(200,216,232,0.25);
+      border-left: 3px solid #8ab4d8;
+      padding: 8px 14px;
+      margin: 8px 0;
+      color: #3a4a58;
+      line-height: 1.9;
+    }
+
+    /* ── Presentation panel ── */
+    .slides-panel {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 32px;
+      background: #ede8db;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-auto-rows: min-content;
+      gap: 20px;
+      align-content: start;
+    }
+
+    .slide {
+      background: #faf7ee;
+      border-radius: 6px;
+      border: 1.5px solid #d8ccb4;
+      padding: 20px 22px;
+      box-shadow: 2px 2px 0 #c4b898;
+      min-height: 140px;
+    }
+
+    .slide.wide { grid-column: 1 / -1; }
+
+    .slide-num {
+      font-size: 11px;
+      color: #b09878;
+      font-style: italic;
+      margin-bottom: 4px;
+    }
+
+    .slide h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #2c1a08;
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+
+    .slide p, .slide li {
+      font-size: 14px;
+      color: #4a3828;
+      line-height: 1.7;
+    }
+
+    .slide ul { margin-left: 18px; }
+
+    .slide .accent {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+
+    .slide-title {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, #f0e8d8, #faf7ee);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 160px;
+    }
+
+    .slide-title h2 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #2c1a08;
+    }
+
+    .slide-title p {
+      font-size: 16px;
+      color: #7a6040;
+      font-style: italic;
+    }
+
+    .mapping-row {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      padding: 3px 0;
+      border-bottom: 1px dashed #e0d4b8;
+      color: #3a2c18;
+    }
+
+    .mapping-row:last-child { border-bottom: none; }
+    .mapping-arrow { color: #9a8060; font-size: 14px; }
+    .mapping-left  { text-align: right; font-style: italic; color: #5a6878; }
+    .mapping-right { color: #4a5838; }
+
+  </style>
+</head>
+<body>
+
+<div class="notebook">
+  <div class="binding">
+    <div class="hole"></div>
+    <div class="hole"></div>
+    <div class="hole"></div>
+    <div class="hole"></div>
+    <div class="hole"></div>
+    <div class="hole"></div>
+  </div>
+
+  <div class="page">
+    <div class="page-header">
+      <div class="page-title">Chromesthetic Canvas</div>
+      <div class="page-subtitle">painting with sound &mdash; listening to color</div>
+    </div>
+
+    <div class="tab-bar">
+      <div class="tab active" data-tab="canvas">Canvas</div>
+      <div class="tab" data-tab="proposal">Proposal</div>
+      <div class="tab" data-tab="presentation">Presentation</div>
+      <div class="tab" data-tab="writeup">Writeup</div>
+    </div>
+
+    <!-- ── Canvas panel ── -->
+    <div class="tab-panel active" id="panel-canvas">
+    <div class="workspace">
+      <div class="margin-controls">
+
+        <!-- Tool select -->
+        <div class="ctrl-group">
+          <div class="ctrl-label">tool</div>
+          <div class="tool-row">
+            <div class="tool-btn active" id="tool-brush" data-tool="brush">✏️ brush</div>
+            <div class="tool-btn"        id="tool-eraser" data-tool="eraser">⬜ erase</div>
+          </div>
+        </div>
+
+        <hr class="ctrl-divider">
+
+        <!-- Color mode -->
+        <div class="ctrl-group">
+          <div class="ctrl-label">color</div>
+          <div class="color-mode-row">
+            <div class="color-mode-btn active" id="cmode-auto">auto FM</div>
+            <div class="color-mode-btn"        id="cmode-manual">pick</div>
+          </div>
+          <div class="color-picker-wrap" id="picker-wrap" style="opacity:.35;pointer-events:none;">
+            <input type="color" id="color-pick" value="#b0d0ff">
+            <div class="color-swatch" id="color-swatch"></div>
+          </div>
+        </div>
+
+        <hr class="ctrl-divider">
+
+        <!-- Brush size -->
+        <div class="ctrl-group">
+          <div class="ctrl-label">brush size</div>
+          <div class="ctrl-row"><span></span><span class="ctrl-val" id="val-size">6</span></div>
+          <input type="range" id="brush-size" min="1" max="30" step="1" value="6">
+        </div>
+
+        <!-- C:M ratio -->
+        <div class="ctrl-group">
+          <div class="ctrl-label">C:M ratio</div>
+          <div class="ctrl-row"><span></span><span class="ctrl-val" id="val-ratio">2.0</span></div>
+          <input type="range" id="ratio" min="0.5" max="4.0" step="0.1" value="2.0">
+        </div>
+
+        <!-- Reverb -->
+        <div class="ctrl-group">
+          <div class="ctrl-label">reverb send</div>
+          <div class="ctrl-row"><span></span><span class="ctrl-val" id="val-reverb">0.30</span></div>
+          <input type="range" id="reverb" min="0" max="1" step="0.01" value="0.30">
+        </div>
+
+        <!-- Decay -->
+        <div class="ctrl-group">
+          <div class="ctrl-label">voice decay</div>
+          <div class="ctrl-row"><span></span><span class="ctrl-val" id="val-decay">0.50 s</span></div>
+          <input type="range" id="decay" min="0.1" max="2.0" step="0.05" value="0.50">
+        </div>
+
+        <hr class="ctrl-divider">
+
+        <div class="margin-legend">
+          x &rarr; pitch + hue<br>
+          y &rarr; FM depth + sat.<br>
+          speed &rarr; attack<br>
+          ratio &rarr; hue shift<br>
+          reverb &rarr; line wt.<br>
+          amp &rarr; brightness
+        </div>
+      </div>
+
+      <!-- Two-canvas stack: bg (ruled lines) + draw (strokes) -->
+      <div class="canvas-wrap">
+        <canvas id="bg-canvas"></canvas>
+        <canvas id="draw-canvas"></canvas>
+        <div class="amp-meter"><div class="amp-fill" id="amp-fill"></div></div>
+      </div>
+    </div>
+
+    <div class="transport">
+      <button id="btn-clear">Clear</button>
+      <button id="btn-replay" disabled>Replay</button>
+      <span class="status" id="status">draw to begin</span>
+      <span class="stroke-tally" id="tally"></span>
+    </div>
+    </div><!-- end panel-canvas -->
+
+    <!-- ── Proposal panel ── -->
+    <div class="tab-panel" id="panel-proposal">
+      <div class="prose-panel">
+        <h1>Chromesthetic Canvas</h1>
+        <p class="meta">Final Project Proposal &nbsp;|&nbsp; WebAudio &nbsp;|&nbsp; Digital Signal Processing</p>
+
+        <h2>Project Overview</h2>
+        <p>Chromesthesia is the neurological phenomenon where auditory stimuli involuntarily trigger color perception. This project inverts it: you paint on a canvas with gestures, and those gestures generate sound in real time. The canvas becomes simultaneously an instrument, a score, and a visual artwork.</p>
+        <p>Every brushstroke is a musical event. The finished painting is also a finished performance. The core design constraint is that color cannot be chosen directly — it is derived entirely from the sound parameters you create, making the visual palette a byproduct of musical decisions.</p>
+
+        <h2>Conceptual Grounding</h2>
+        <p>The project draws on two ideas in dialogue:</p>
+        <ul>
+          <li><strong>FM synthesis as expressive gesture.</strong> The carrier/modulator relationship governs timbre. Rather than setting FM parameters numerically, the user sets them spatially and kinetically — where you draw and how fast become the compositional act.</li>
+          <li><strong>The graphic score tradition</strong> (Earle Brown, Cornelius Cardew). These composers created visual artifacts meant to be interpreted as music. This project generates both artifacts simultaneously and deterministically from the same source.</li>
+        </ul>
+
+        <h2>Gesture-to-Sound-to-Color Mapping</h2>
+        <table>
+          <tr><th>Canvas gesture</th><th>WebAudio parameter</th><th>Visual output</th></tr>
+          <tr><td>Pointer x-position</td><td>Carrier frequency (100–2000 Hz, log scale)</td><td>Stroke hue (maps to musical pitch region)</td></tr>
+          <tr><td>Pointer y-position</td><td>FM modulation index via GainNode (0–10)</td><td>Stroke saturation (pure → complex timbre)</td></tr>
+          <tr><td>Pointer velocity</td><td>Amplitude envelope attack time (1ms–500ms)</td><td>Stroke opacity (fast = opaque, slow = translucent)</td></tr>
+          <tr><td>Stroke width (slider)</td><td>Convolution reverb send level (dry/wet 0–1)</td><td>Stroke line width (spacious sound = thick stroke)</td></tr>
+          <tr><td>Carrier:modulator ratio</td><td>Determines harmonic spectrum (integer = tonal)</td><td>Stroke hue offset (inharmonic = shifted color)</td></tr>
+        </table>
+
+        <h2>Technical Architecture</h2>
+        <p>Each pointer stroke spawns one polyphonic FM voice, capped at 8 simultaneous voices. Voices are managed as JavaScript objects with explicit lifecycle methods (start, release, dispose).</p>
+        <p><strong>Signal chain per voice:</strong></p>
+        <div class="signal-chain">
+          OscillatorNode (modulator) → GainNode (mod index, driven by y-position) → OscillatorNode (carrier, driven by x-position)<br>
+          Carrier output → GainNode (amplitude envelope, driven by velocity) → dry/wet split<br>
+          Dry → masterGain → AnalyserNode → AudioContext.destination<br>
+          Wet → ConvolverNode (reverb, driven by stroke width) → masterGain
+        </div>
+        <p><strong>Color derivation:</strong></p>
+        <ul>
+          <li><strong>Hue:</strong> derived logarithmically from carrier frequency (left = warm/low pitch, right = cool/high pitch); inharmonic ratios shift hue further.</li>
+          <li><strong>Saturation:</strong> maps from modulation index (0 = gray/pure sine, 75% = pastel/complex).</li>
+          <li><strong>Lightness:</strong> maps from instantaneous amplitude (quiet = darker; loud = brighter). Held in pastel range (68–82%).</li>
+        </ul>
+
+        <h2>Rubric Alignment</h2>
+        <table>
+          <tr><th>Criterion</th><th>Pts</th><th>How This Project Meets It</th></tr>
+          <tr><td>Concept from class</td><td>4</td><td>FM synthesis — x-axis maps carrier frequency, y-axis maps modulation index. The GainNode-as-modulation-index pattern is applied directly as the core musical engine.</td></tr>
+          <tr><td>Code technique from class</td><td>4</td><td>GainNode controlling FM modulation index in real time, driven by canvas pointer y-position. OscillatorNode frequency automation via AudioParam.setTargetAtTime.</td></tr>
+          <tr><td>Topic not covered in class</td><td>4</td><td>Convolution reverb from a procedurally generated impulse response; pointer velocity mapped to envelope attack time; HSL color derived algorithmically from FM parameters.</td></tr>
+          <tr><td>Code quality</td><td>2</td><td>No copy-paste. Module pattern (AudioEngine, DrawCanvas, StrokeStore, etc.). Well-named variables. Functions under 20 lines.</td></tr>
+          <tr><td>Above and beyond</td><td>4</td><td>Replay system: strokes serialized with timestamps and FM parameters. Playback redraws the canvas and re-triggers audio in perfect sync — the painting performs itself as a deterministic concert.</td></tr>
+        </table>
+
+        <h2>Above and Beyond: the Replay System</h2>
+        <p>As the user draws, every stroke is recorded as a plain JavaScript object containing path points, FM parameters, color, line weight, and a timestamp relative to session start. When the user hits Replay, the canvas clears and redraws each stroke at the original timestamp offset, while the audio engine re-fires the corresponding FM voice with identical parameters.</p>
+        <p>This transforms the project from an instrument into a notation system. Each session produces a unique, reproducible artwork-performance pair. If the painting and the music are the same thing — which one is the score?</p>
+
+        <h2>Scope &amp; Feasibility</h2>
+        <table>
+          <tr><th>Phase</th><th>Days</th><th>Deliverable</th></tr>
+          <tr><td>1</td><td>1–2</td><td>FM voice factory + polyphonic engine (8-voice cap). Silent canvas with pointer tracking.</td></tr>
+          <tr><td>2</td><td>3–4</td><td>Audio↔visual binding: HSL color derived from FM params, live stroke rendering synchronized to audio events.</td></tr>
+          <tr><td>3</td><td>5</td><td>ConvolverNode reverb send + stroke width mapping. Tuning of frequency range and mod index feel.</td></tr>
+          <tr><td>4</td><td>6–7</td><td>Replay system: stroke serialization, timestamp-accurate audio + canvas playback.</td></tr>
+          <tr><td>5</td><td>8</td><td>Polish, code review, comments, variable naming pass. Demo recording.</td></tr>
+        </table>
+      </div>
+    </div><!-- end panel-proposal -->
+
+    <!-- ── Presentation panel ── -->
+    <div class="tab-panel" id="panel-presentation">
+      <div class="slides-panel">
+
+        <div class="slide slide-title">
+          <h2>Chromesthetic Canvas</h2>
+          <p>Painting with Sound &mdash; Listening to Color</p>
+          <p style="font-size:13px;margin-top:10px;color:#9a8060;">WebAudio Final Project &nbsp;·&nbsp; Digital Signal Processing</p>
+        </div>
+
+        <div class="slide">
+          <div class="slide-num">01</div>
+          <h3>What is Chromesthesia?</h3>
+          <p>A neurological phenomenon where sound involuntarily triggers color perception. Some people see colors when they hear music.</p>
+          <p style="margin-top:8px;">This project <strong>inverts</strong> it: drawing generates sound, and sound generates color.</p>
+        </div>
+
+        <div class="slide">
+          <div class="slide-num">02</div>
+          <h3>The Core Constraint</h3>
+          <p>Color <em>cannot</em> be chosen directly.</p>
+          <p style="margin-top:6px;">It is derived entirely from the sound parameters you create while drawing. The visual palette is a byproduct of musical decisions.</p>
+        </div>
+
+        <div class="slide wide">
+          <div class="slide-num">03</div>
+          <h3>Gesture → Sound → Color Mapping</h3>
+          <div class="mapping-row"><span class="mapping-left">x position</span><span class="mapping-arrow">→</span><span class="mapping-right">carrier frequency (100–2000 Hz, log) → hue</span></div>
+          <div class="mapping-row"><span class="mapping-left">y position</span><span class="mapping-arrow">→</span><span class="mapping-right">FM modulation index (0–10) → saturation</span></div>
+          <div class="mapping-row"><span class="mapping-left">pointer speed</span><span class="mapping-arrow">→</span><span class="mapping-right">envelope attack time (1–400 ms) → opacity</span></div>
+          <div class="mapping-row"><span class="mapping-left">reverb slider</span><span class="mapping-arrow">→</span><span class="mapping-right">convolution reverb wet/dry → stroke weight</span></div>
+          <div class="mapping-row"><span class="mapping-left">C:M ratio</span><span class="mapping-arrow">→</span><span class="mapping-right">harmonic spectrum (integer = tonal) → hue shift</span></div>
+        </div>
+
+        <div class="slide">
+          <div class="slide-num">04</div>
+          <h3>FM Signal Chain</h3>
+          <p style="font-size:12px;font-family:monospace;line-height:2;color:#3a4a58;">
+            modOsc → modGain<br>
+            modGain → carrierOsc.frequency<br>
+            carrierOsc → ampGain<br>
+            ampGain → dry → masterGain<br>
+            ampGain → wet → convolver → masterGain<br>
+            masterGain → analyser → out
+          </p>
+        </div>
+
+        <div class="slide">
+          <div class="slide-num">05</div>
+          <h3>Pastel Color Derivation</h3>
+          <ul>
+            <li><strong>Hue</strong> — log-mapped from carrier frequency across 300° of spectrum</li>
+            <li><strong>Saturation</strong> — FM modulation index × 3 + 45 (45–75%)</li>
+            <li><strong>Lightness</strong> — amplitude reading from AnalyserNode (68–82%)</li>
+          </ul>
+          <p style="margin-top:8px;font-size:13px;color:#7a6848;">All three channels are byproducts of sound — never set directly.</p>
+        </div>
+
+        <div class="slide">
+          <div class="slide-num">06</div>
+          <h3>Not Covered in Class</h3>
+          <ul>
+            <li>Convolution reverb via <strong>procedurally generated impulse response</strong> (decaying white noise buffer)</li>
+            <li>Pointer <strong>velocity → attack time</strong> inverse mapping</li>
+            <li>Bidirectional audio ↔ visual feedback loop</li>
+          </ul>
+        </div>
+
+        <div class="slide">
+          <div class="slide-num">07</div>
+          <h3>The Replay System</h3>
+          <p>Every stroke is serialized: <code style="font-size:12px;">{ path, carrierFreq, modIndex, ratio, color, relTime, duration }</code></p>
+          <p style="margin-top:8px;">Replay clears the canvas and re-animates each stroke at its original timestamp while re-firing the exact FM voice. The painting paints itself while playing itself.</p>
+        </div>
+
+        <div class="slide">
+          <div class="slide-num">08</div>
+          <h3>Concepts from Class Applied</h3>
+          <ul>
+            <li><strong>FM synthesis</strong> — GainNode as modulation depth (modFreq × modIndex)</li>
+            <li><strong>AudioParam.setTargetAtTime</strong> — exponential amplitude envelopes</li>
+            <li><strong>AnalyserNode</strong> — real-time amplitude metering for color brightness</li>
+            <li><strong>Polyphony management</strong> — 8-voice cap with FIFO eviction</li>
+          </ul>
+        </div>
+
+      </div>
+    </div><!-- end panel-presentation -->
+
+    <!-- ── Writeup panel ── -->
+    <div class="tab-panel" id="panel-writeup">
+      <div class="prose-panel">
+        <h1>Technical Writeup</h1>
+        <p class="meta">Chromesthetic Canvas &nbsp;|&nbsp; WebAudio Final Project</p>
+
+        <h2>Concept</h2>
+        <p>The central question driving this project was: what would it look like if a painting and a musical performance were literally the same object? Not one illustrating the other, but both emerging deterministically from a single source — the gesture of drawing.</p>
+        <p>Chromesthesia provided the conceptual frame. In people with this form of synesthesia, sounds produce involuntary color experiences. The project inverts the direction: drawing produces sound, and those sound parameters produce color. The user never chooses a color or a note directly. Both emerge from a single physical act.</p>
+
+        <h2>FM Synthesis as the Core Engine</h2>
+        <p>FM synthesis was chosen because it produces a wide range of timbres from a compact set of parameters — carrier frequency, modulator frequency, and modulation index. This maps cleanly onto a two-dimensional canvas: x-position controls carrier frequency on a logarithmic scale (100–2000 Hz), and y-position controls the modulation index via a GainNode. This is the GainNode-as-modulation-index pattern from class, applied directly as the compositional interface.</p>
+        <p>The modulation depth follows the standard FM formula: <code>depth = modulatorFreq × modIndex</code>. As you draw upward (toward lower y values), the modulation index rises, adding overtones and harmonic complexity to the sound. Drawing downward produces a pure sine tone. This gives the vertical axis a direct perceptual meaning: high on the page sounds metallic and complex; low on the page sounds smooth and pure.</p>
+
+        <h2>Envelope and Velocity</h2>
+        <p>Pointer velocity is mapped inversely to amplitude envelope attack time using <code>AudioParam.setTargetAtTime</code>. A fast stroke produces a short attack — the sound snaps in percussively. A slow stroke produces a long attack — the sound swells in gently. This is not covered in class and required working out the inverse mapping: <code>attackTime = 400 / (velocity × 18 + 1)</code> milliseconds, clamped to a minimum of 2ms.</p>
+        <p>This means that the speed of your gesture has a direct, audible consequence — which in turn affects stroke opacity in the auto-color mode, since opacity is tied to amplitude at the moment of stroke creation.</p>
+
+        <h2>Convolution Reverb</h2>
+        <p>Each voice routes through a shared ConvolverNode loaded with a procedurally generated impulse response. The impulse is two seconds of exponentially decaying white noise, created at runtime using <code>AudioContext.createBuffer</code>. The reverb send level is controlled by the slider in the margin, which also scales the stroke line weight — a spacious, wet sound produces a thicker line. This bidirectional mapping is not covered in class.</p>
+
+        <h2>Color Derivation</h2>
+        <p>Color is computed entirely from FM parameters and may never be set directly by the user in auto mode. Hue is log-mapped from carrier frequency across 300 degrees of the HSL spectrum, so drawing from left to right sweeps from orange through green, blue, and into purple — the same direction as pitch rising. The carrier-to-modulator ratio shifts hue further: inharmonic ratios (fractional values like 1.5 or 2.7) add up to 60 degrees of cool shift, while integer ratios (1, 2, 3) leave the hue unshifted. Saturation comes from the modulation index, and lightness is sampled from the AnalyserNode's frequency data at the moment of stroke creation.</p>
+        <p>All colors are kept in the pastel range (lightness 68–82%, saturation 45–75%) so the canvas reads as a coherent artwork rather than a stress test of the color gamut.</p>
+
+        <h2>The Replay System</h2>
+        <p>Every completed brush stroke is serialized into a plain JavaScript object containing the full path array, all FM parameters, the computed color, line weight, and a timestamp relative to the session start. When the user hits Replay, the canvas clears and each stroke is re-scheduled with <code>setTimeout</code> at its original relative timestamp. The FM voice for that stroke re-fires with identical parameters, and the path is re-animated segment by segment across the stroke's original duration.</p>
+        <p>The result is a deterministic performance: the painting paints itself while playing itself. This transforms the canvas from an instrument into a notation system. The question the project is designed to leave open: if the painting and the music are the same thing, which one is the score?</p>
+
+        <h2>Code Structure</h2>
+        <p>The implementation is organized into self-contained modules using the revealing module pattern:</p>
+        <ul>
+          <li><strong>AudioEngine</strong> — FM voice factory, shared reverb and analyser bus, FIFO voice eviction at the 8-voice cap.</li>
+          <li><strong>BgCanvas</strong> — static ruled-paper background, drawn once and never touched by user interaction.</li>
+          <li><strong>DrawCanvas</strong> — receives strokes additively; eraser uses <code>destination-out</code> compositing to punch holes, revealing the background layer beneath.</li>
+          <li><strong>StrokeStore</strong> — append-only array of serialized strokes with relative timestamps.</li>
+          <li><strong>InputHandler</strong> — translates pointer events into FM parameters and canvas paint calls; skips audio for the eraser tool.</li>
+          <li><strong>ReplayEngine</strong> — schedules audio and canvas animation from the stroke store; cancels all timeouts cleanly on stop.</li>
+        </ul>
+
+        <h2>Reflection</h2>
+        <p>The hardest part of the project was not the WebAudio implementation — the FM chain is relatively straightforward once the parameter mappings are decided. The hard part was designing the mappings themselves so that they feel natural while drawing. Several iterations were needed: the first version used linear frequency scaling, which made the left quarter of the canvas sound identical and the right quarter feel impossibly high. Switching to a logarithmic scale (matching how human pitch perception works) made the canvas feel playable across its full width.</p>
+        <p>The replay system was the most satisfying feature to build. Watching the canvas repaint itself while the corresponding sounds re-emerge makes clear in a way that no explanation can that the image and the music really are the same object. The painting is a score. The score is a painting.</p>
+      </div>
+    </div><!-- end panel-writeup -->
+
+  </div><!-- end .page -->
+</div><!-- end .notebook -->
+
+<script>
+'use strict';
+
+// ── Constants ──────────────────────────────────────────────────────────────
+const MAX_VOICES = 8;
+const FREQ_MIN   = 100;
+const FREQ_MAX   = 2000;
+const LINE_GAP   = 28;
+const BG_COLOR   = '#faf7ee';
+
+// ── AudioEngine ────────────────────────────────────────────────────────────
+const AudioEngine = (() => {
+  let ctx, convolver, analyser, masterGain;
+  const voices     = new Map();
+  const voiceQueue = [];
+
+  function boot() {
+    if (ctx) return;
+    ctx        = new AudioContext();
+    masterGain = ctx.createGain();
+    masterGain.gain.value = 0.65;
+    analyser   = ctx.createAnalyser();
+    analyser.fftSize = 256;
+    convolver  = ctx.createConvolver();
+    convolver.buffer = buildImpulse(2.2, 0.5);
+    convolver.connect(masterGain);
+    masterGain.connect(analyser);
+    analyser.connect(ctx.destination);
+  }
+
+  function buildImpulse(duration, decay) {
+    const sr  = ctx.sampleRate;
+    const len = Math.floor(sr * duration);
+    const buf = ctx.createBuffer(2, len, sr);
+    for (let ch = 0; ch < 2; ch++) {
+      const d = buf.getChannelData(ch);
+      for (let i = 0; i < len; i++) {
+        d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
+      }
+    }
+    return buf;
+  }
+
+  function startVoice(id, { carrierFreq, modIndex, ratio, attackTime, reverbSend }) {
+    boot();
+    if (voices.size >= MAX_VOICES) evictOldest();
+
+    const t       = ctx.currentTime;
+    const modFreq = carrierFreq * ratio;
+
+    const modOsc     = ctx.createOscillator();
+    const modGain    = ctx.createGain();
+    const carrierOsc = ctx.createOscillator();
+    const ampGain    = ctx.createGain();
+    const dryGain    = ctx.createGain();
+    const wetGain    = ctx.createGain();
+
+    modOsc.frequency.value     = modFreq;
+    modGain.gain.value         = modFreq * modIndex;
+    carrierOsc.frequency.value = carrierFreq;
+
+    ampGain.gain.setValueAtTime(0, t);
+    ampGain.gain.setTargetAtTime(0.28, t, attackTime / 1000);
+
+    dryGain.gain.value = 1 - reverbSend;
+    wetGain.gain.value = reverbSend;
+
+    modOsc.connect(modGain);
+    modGain.connect(carrierOsc.frequency);
+    carrierOsc.connect(ampGain);
+    ampGain.connect(dryGain);
+    ampGain.connect(wetGain);
+    dryGain.connect(masterGain);
+    wetGain.connect(convolver);
+
+    modOsc.start(t);
+    carrierOsc.start(t);
+
+    voices.set(id, { modOsc, modGain, carrierOsc, ampGain, dryGain, wetGain });
+    voiceQueue.push(id);
+  }
+
+  function releaseVoice(id, releaseTime = 0.4) {
+    const v = voices.get(id);
+    if (!v) return;
+    v.ampGain.gain.setTargetAtTime(0, ctx.currentTime, releaseTime);
+    setTimeout(() => disposeVoice(id), releaseTime * 4500);
+  }
+
+  function disposeVoice(id) {
+    const v = voices.get(id);
+    if (!v) return;
+    try { v.modOsc.stop();     } catch (_) {}
+    try { v.carrierOsc.stop(); } catch (_) {}
+    Object.values(v).forEach(n => { try { n.disconnect(); } catch (_) {} });
+    voices.delete(id);
+    const i = voiceQueue.indexOf(id);
+    if (i !== -1) voiceQueue.splice(i, 1);
+  }
+
+  function evictOldest() {
+    if (voiceQueue.length) releaseVoice(voiceQueue[0], 0.04);
+  }
+
+  function releaseAll() {
+    [...voiceQueue].forEach(id => releaseVoice(id, 0.05));
+  }
+
+  function getAmplitude() {
+    if (!analyser) return 0;
+    const buf = new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteFrequencyData(buf);
+    return buf.reduce((s, v) => s + v, 0) / (buf.length * 255);
+  }
+
+  return { startVoice, releaseVoice, releaseAll, getAmplitude };
+})();
+
+// ── BgCanvas — static ruled-paper background, never erased ────────────────
+const BgCanvas = (() => {
+  const canvas = document.getElementById('bg-canvas');
+  const ctx    = canvas.getContext('2d');
+
+  function draw() {
+    ctx.fillStyle = BG_COLOR;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = '#c4d4e4';
+    ctx.lineWidth   = 0.8;
+    for (let y = LINE_GAP; y < canvas.height; y += LINE_GAP) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(canvas.width, y);
+      ctx.stroke();
+    }
+  }
+
+  function resize(w, h) {
+    canvas.width  = w;
+    canvas.height = h;
+    draw();
+  }
+
+  return { resize };
+})();
+
+// ── DrawCanvas — strokes + eraser, transparent background ─────────────────
+const DrawCanvas = (() => {
+  const canvas = document.getElementById('draw-canvas');
+  const ctx    = canvas.getContext('2d');
+
+  function resize(w, h) {
+    canvas.width  = w;
+    canvas.height = h;
+    // Transparent so BgCanvas shows through
+  }
+
+  function clear() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  // isEraser uses destination-out to punch holes, revealing the bg canvas beneath.
+  function paintSegment(points, color, lineWidth, isEraser = false) {
+    if (points.length === 0) return;
+
+    ctx.save();
+    ctx.lineCap     = 'round';
+    ctx.lineJoin    = 'round';
+    ctx.lineWidth   = lineWidth;
+
+    if (isEraser) {
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.strokeStyle = 'rgba(0,0,0,1)';
+      ctx.fillStyle   = 'rgba(0,0,0,1)';
+    } else {
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.strokeStyle = color;
+      ctx.fillStyle   = color;
+      ctx.globalAlpha = 0.9;
+    }
+
+    if (points.length === 1) {
+      ctx.beginPath();
+      ctx.arc(points[0].x, points[0].y, lineWidth / 2, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, points[0].y);
+      for (let i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  }
+
+  return { canvas, resize, clear, paintSegment };
+})();
+
+// ── Resize both canvases together ──────────────────────────────────────────
+function resizeCanvases() {
+  const wrap = document.getElementById('draw-canvas').parentElement;
+  const w    = wrap.clientWidth;
+  const h    = wrap.clientHeight;
+  BgCanvas.resize(w, h);
+  DrawCanvas.resize(w, h);
+}
+
+// ── Parameter mapping ──────────────────────────────────────────────────────
+function xToFreq(x) {
+  const t = Math.max(0, Math.min(1, x / DrawCanvas.canvas.width));
+  return FREQ_MIN * Math.pow(FREQ_MAX / FREQ_MIN, t);
+}
+
+function yToModIndex(y) {
+  const t = Math.max(0, Math.min(1, y / DrawCanvas.canvas.height));
+  return 10 * (1 - t);
+}
+
+function velocityToAttack(pxPerMs) {
+  return Math.max(2, 400 / (pxPerMs * 18 + 1));
+}
+
+// Pastel FM color: hue from pitch, saturation from FM depth, lightness stays high.
+function fmToHSL(carrierFreq, modIndex, ratio, amplitude) {
+  const freqT      = Math.log(carrierFreq / FREQ_MIN) / Math.log(FREQ_MAX / FREQ_MIN);
+  const freqHue    = freqT * 300;
+  const inharmonic = Math.abs(ratio - Math.round(ratio));
+  const hue        = (freqHue + inharmonic * 60) % 360;
+  // Pastel ranges: moderate saturation, high lightness
+  const saturation = 45 + modIndex * 3;      // 45–75 %
+  const lightness  = 68 + (amplitude || 0.5) * 14; // 68–82 %
+  return `hsl(${hue.toFixed(1)},${saturation.toFixed(1)}%,${lightness.toFixed(1)}%)`;
+}
+
+// ── Tool & color state ─────────────────────────────────────────────────────
+const State = {
+  tool:       'brush',   // 'brush' | 'eraser'
+  colorMode:  'auto',    // 'auto'  | 'manual'
+  manualColor: '#b0d0ff',
+};
+
+// ── StrokeStore ────────────────────────────────────────────────────────────
+const StrokeStore = (() => {
+  const strokes = [];
+  let sessionStart = null;
+
+  function add(stroke) {
+    if (!sessionStart) sessionStart = stroke.timestamp;
+    strokes.push({ ...stroke, relTime: stroke.timestamp - sessionStart });
+  }
+
+  function all()   { return strokes; }
+  function count() { return strokes.length; }
+  function clear() { strokes.length = 0; sessionStart = null; }
+
+  return { add, all, count, clear };
+})();
+
+// ── InputHandler ───────────────────────────────────────────────────────────
+const InputHandler = (() => {
+  let active = null;
+  let prevPt = null;
+
+  function readSlider(id) { return parseFloat(document.getElementById(id).value); }
+
+  function buildParams(x, y, velocity) {
+    const carrierFreq = xToFreq(x);
+    const modIndex    = yToModIndex(y);
+    const ratio       = readSlider('ratio');
+    const reverbSend  = readSlider('reverb');
+    const attackTime  = velocityToAttack(velocity);
+    const brushSize   = readSlider('brush-size');
+    const amplitude   = AudioEngine.getAmplitude();
+
+    const color = State.colorMode === 'manual'
+      ? State.manualColor
+      : fmToHSL(carrierFreq, modIndex, ratio, amplitude);
+
+    // In manual-color mode, line width comes from brush-size only.
+    // In auto mode, reverb blends with brush-size for expressiveness.
+    const lineWidth = State.colorMode === 'manual'
+      ? brushSize
+      : brushSize * 0.6 + reverbSend * brushSize * 0.8;
+
+    return { carrierFreq, modIndex, ratio, reverbSend, attackTime, color, lineWidth };
+  }
+
+  function ptFrom(e) {
+    const r = DrawCanvas.canvas.getBoundingClientRect();
+    return { x: e.clientX - r.left, y: e.clientY - r.top, t: performance.now() };
+  }
+
+  function onDown(e) {
+    e.preventDefault();
+    const pt     = ptFrom(e);
+    const isErase = State.tool === 'eraser';
+    const params = isErase ? { lineWidth: readSlider('brush-size') * 2 } : buildParams(pt.x, pt.y, 0.4);
+    const id     = pt.t.toString();
+
+    active = { id, path: [pt], timestamp: Date.now(), isErase, ...params };
+    prevPt = pt;
+
+    DrawCanvas.paintSegment([pt], params.color, params.lineWidth, isErase);
+    if (!isErase) AudioEngine.startVoice(id, params);
+    DrawCanvas.canvas.setPointerCapture(e.pointerId);
+    setStatus(isErase ? 'erasing…' : 'drawing…');
+  }
+
+  function onMove(e) {
+    if (!active) return;
+    e.preventDefault();
+    const pt = ptFrom(e);
+    const dt = Math.max(pt.t - prevPt.t, 1);
+    const dx = pt.x - prevPt.x;
+    const dy = pt.y - prevPt.y;
+    const velocity = Math.sqrt(dx * dx + dy * dy) / dt;
+
+    DrawCanvas.paintSegment([prevPt, pt], active.color, active.lineWidth, active.isErase);
+    active.path.push(pt);
+    prevPt = pt;
+    void velocity;
+  }
+
+  function onUp() {
+    if (!active) return;
+    if (!active.isErase) {
+      const decay = readSlider('decay');
+      AudioEngine.releaseVoice(active.id, decay);
+      active.duration = Date.now() - active.timestamp;
+      StrokeStore.add(active);
+    }
+    active = null;
+    prevPt = null;
+    refreshUI();
+    setStatus('draw to continue');
+  }
+
+  function attach() {
+    const c = DrawCanvas.canvas;
+    c.addEventListener('pointerdown',   onDown);
+    c.addEventListener('pointermove',   onMove);
+    c.addEventListener('pointerup',     onUp);
+    c.addEventListener('pointercancel', onUp);
+  }
+
+  return { attach };
+})();
+
+// ── ReplayEngine ───────────────────────────────────────────────────────────
+const ReplayEngine = (() => {
+  let handles = [];
+  let active  = false;
+
+  function run(strokes, onDone) {
+    if (active) return;
+    active = true;
+    DrawCanvas.clear();
+    setStatus('replaying…');
+    lockControls(true);
+
+    const maxEnd = Math.max(...strokes.map(s => s.relTime + s.duration));
+    const decay  = parseFloat(document.getElementById('decay').value);
+
+    strokes.forEach(stroke => {
+      const h = setTimeout(() => {
+        AudioEngine.startVoice(stroke.id + '_r', stroke);
+        animateStrokeDraw(stroke);
+        setTimeout(() => AudioEngine.releaseVoice(stroke.id + '_r', decay), stroke.duration);
+      }, stroke.relTime);
+      handles.push(h);
+    });
+
+    const done = setTimeout(() => {
+      active = false;
+      lockControls(false);
+      setStatus('replay complete');
+      onDone?.();
+    }, maxEnd + 600);
+    handles.push(done);
+  }
+
+  function animateStrokeDraw({ path, color, lineWidth, duration }) {
+    if (path.length < 2) {
+      DrawCanvas.paintSegment([path[0]], color, lineWidth);
+      return;
+    }
+    const msPerPt = duration / path.length;
+    for (let i = 1; i < path.length; i++) {
+      const h = setTimeout(() => {
+        DrawCanvas.paintSegment([path[i - 1], path[i]], color, lineWidth);
+      }, i * msPerPt);
+      handles.push(h);
+    }
+  }
+
+  function stop() {
+    handles.forEach(clearTimeout);
+    handles = [];
+    active  = false;
+  }
+
+  return { run, stop };
+})();
+
+// ── UI helpers ─────────────────────────────────────────────────────────────
+function setStatus(msg) {
+  document.getElementById('status').textContent = msg;
+}
+
+function refreshUI() {
+  const n = StrokeStore.count();
+  document.getElementById('tally').textContent = n ? `${n} stroke${n !== 1 ? 's' : ''}` : '';
+  document.getElementById('btn-replay').disabled = n === 0;
+}
+
+function lockControls(on) {
+  ['btn-clear','btn-replay','ratio','reverb','decay','brush-size']
+    .forEach(id => { document.getElementById(id).disabled = on; });
+  DrawCanvas.canvas.style.pointerEvents = on ? 'none' : 'auto';
+}
+
+// Slider displays
+[
+  { id: 'brush-size', key: 'val-size',  fmt: v => Math.round(v) },
+  { id: 'ratio',      key: 'val-ratio', fmt: v => parseFloat(v).toFixed(1) },
+  { id: 'reverb',     key: 'val-reverb',fmt: v => parseFloat(v).toFixed(2) },
+  { id: 'decay',      key: 'val-decay', fmt: v => `${parseFloat(v).toFixed(2)} s` },
+].forEach(({ id, key, fmt }) => {
+  const el  = document.getElementById(id);
+  const val = document.getElementById(key);
+  el.addEventListener('input', () => { val.textContent = fmt(el.value); });
+});
+
+// Tool buttons
+document.querySelectorAll('.tool-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    State.tool = btn.dataset.tool;
+    DrawCanvas.canvas.style.cursor = State.tool === 'eraser' ? 'cell' : 'crosshair';
+  });
+});
+
+// Color mode buttons
+const pickerWrap = document.getElementById('picker-wrap');
+
+document.getElementById('cmode-auto').addEventListener('click', () => {
+  State.colorMode = 'auto';
+  document.getElementById('cmode-auto').classList.add('active');
+  document.getElementById('cmode-manual').classList.remove('active');
+  pickerWrap.style.opacity = '0.35';
+  pickerWrap.style.pointerEvents = 'none';
+});
+
+document.getElementById('cmode-manual').addEventListener('click', () => {
+  State.colorMode = 'manual';
+  document.getElementById('cmode-manual').classList.add('active');
+  document.getElementById('cmode-auto').classList.remove('active');
+  pickerWrap.style.opacity = '1';
+  pickerWrap.style.pointerEvents = 'auto';
+});
+
+// Color picker
+const colorPick  = document.getElementById('color-pick');
+const colorSwatch = document.getElementById('color-swatch');
+colorPick.addEventListener('input', () => {
+  State.manualColor = colorPick.value;
+  colorSwatch.style.background = colorPick.value;
+});
+colorSwatch.style.background = colorPick.value;
+
+// Transport buttons
+document.getElementById('btn-clear').addEventListener('click', () => {
+  ReplayEngine.stop();
+  AudioEngine.releaseAll();
+  DrawCanvas.clear();
+  StrokeStore.clear();
+  refreshUI();
+  setStatus('draw to begin');
+});
+
+document.getElementById('btn-replay').addEventListener('click', () => {
+  ReplayEngine.run(StrokeStore.all(), refreshUI);
+});
+
+
+// Amplitude meter loop
+function tickAmplitude() {
+  document.getElementById('amp-fill').style.height =
+    (AudioEngine.getAmplitude() * 100).toFixed(1) + '%';
+  requestAnimationFrame(tickAmplitude);
+}
+
+// ── Tab switching ──────────────────────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const target = tab.dataset.tab;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-' + target).classList.add('active');
+    // Re-size canvases when returning to canvas tab (layout may have shifted)
+    if (target === 'canvas') resizeCanvases();
+  });
+});
+
+// ── Init ───────────────────────────────────────────────────────────────────
+window.addEventListener('resize', resizeCanvases);
+resizeCanvases();
+InputHandler.attach();
+tickAmplitude();
+refreshUI();
+</script>
+</body>
+</html>
