@@ -2,23 +2,22 @@ const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 let firstClick = true;
 
-// --- AUDIO SYNTHESIS ---
-function playWaterPlop(ctx) {
+function playSound(ctx) {
     const osc = ctx.createOscillator();
     const mod = ctx.createOscillator();
     const modGain = ctx.createGain();
     const masterGain = ctx.createGain();
 
-    // Randomize frequency slightly for organic variety
+    // randomize frequency
     const baseFreq = 350 + (Math.random() * 150);
 
     osc.type = 'sine';
     osc.frequency.setValueAtTime(baseFreq, ctx.currentTime);
-    // The "Bloop" sweep
+
     osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.6, ctx.currentTime + 0.04);
     osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.9, ctx.currentTime + 0.15);
 
-    // Frequency Modulation (The splash texture)
+    // frequency modulation 
     mod.frequency.value = 180;
     modGain.gain.setValueAtTime(300, ctx.currentTime);
     modGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.04);
@@ -28,7 +27,7 @@ function playWaterPlop(ctx) {
     osc.connect(masterGain);
     masterGain.connect(ctx.destination);
 
-    // Volume Envelope
+    // envelope
     masterGain.gain.setValueAtTime(0, ctx.currentTime);
     masterGain.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 0.01);
     masterGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
@@ -39,7 +38,6 @@ function playWaterPlop(ctx) {
     mod.stop(ctx.currentTime + 0.25);
 }
 
-// -- INTERACTION ---
 window.addEventListener('click', (e) => {
     if (audioCtx.state === 'suspended') audioCtx.resume();
 
@@ -66,10 +64,10 @@ window.addEventListener('click', (e) => {
         drop.style.transform = `translateY(${y + 30}px)`;
     }, 10);
 
-    // 3. Impact
+    // ripple
     setTimeout(() => {
         drop.remove();
-        playWaterPlop(audioCtx);
+        playSound(audioCtx);
 
         const ripple = document.createElement('div');
         ripple.className = 'ripple';

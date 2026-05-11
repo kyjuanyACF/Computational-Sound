@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chromesthetic Canvas</title>
+  <title>Musical Canvas</title>
   <style>
     @font-face {
       font-family: 'RainyHearts';
@@ -456,99 +456,44 @@
       line-height: 1.9;
     }
 
-    /* ── Presentation panel ── */
-    .slides-panel {
+
+    /* ── Video placeholder panel ── */
+    .video-panel {
       flex: 1;
-      overflow-y: auto;
-      padding: 24px 32px;
-      background: #ede8db;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-auto-rows: min-content;
-      gap: 20px;
-      align-content: start;
-    }
-
-    .slide {
-      background: #faf7ee;
-      border-radius: 6px;
-      border: 1.5px solid #d8ccb4;
-      padding: 20px 22px;
-      box-shadow: 2px 2px 0 #c4b898;
-      min-height: 140px;
-    }
-
-    .slide.wide { grid-column: 1 / -1; }
-
-    .slide-num {
-      font-size: 11px;
-      color: #b09878;
-      font-style: italic;
-      margin-bottom: 4px;
-    }
-
-    .slide h3 {
-      font-size: 18px;
-      font-weight: 700;
-      color: #2c1a08;
-      margin-bottom: 8px;
-      line-height: 1.2;
-    }
-
-    .slide p, .slide li {
-      font-size: 14px;
-      color: #4a3828;
-      line-height: 1.7;
-    }
-
-    .slide ul { margin-left: 18px; }
-
-    .slide .accent {
-      display: inline-block;
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      margin-right: 4px;
-      vertical-align: middle;
-    }
-
-    .slide-title {
-      grid-column: 1 / -1;
-      background: linear-gradient(135deg, #f0e8d8, #faf7ee);
-      text-align: center;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 160px;
+      background: #ede8db;
+      padding: 40px;
     }
 
-    .slide-title h2 {
-      font-size: 28px;
-      font-weight: 700;
-      color: #2c1a08;
+    .video-placeholder {
+      width: 100%;
+      max-width: 640px;
+      aspect-ratio: 16 / 9;
+      background: #faf7ee;
+      border: 2px dashed #c4b898;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .slide-title p {
-      font-size: 16px;
-      color: #7a6040;
+    .video-placeholder-inner {
+      text-align: center;
+      color: #b09878;
+    }
+
+    .video-icon {
+      font-size: 48px;
+      margin-bottom: 10px;
+      opacity: 0.4;
+    }
+
+    .video-placeholder-inner p {
+      font-size: 18px;
       font-style: italic;
     }
-
-    .mapping-row {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      padding: 3px 0;
-      border-bottom: 1px dashed #e0d4b8;
-      color: #3a2c18;
-    }
-
-    .mapping-row:last-child { border-bottom: none; }
-    .mapping-arrow { color: #9a8060; font-size: 14px; }
-    .mapping-left  { text-align: right; font-style: italic; color: #5a6878; }
-    .mapping-right { color: #4a5838; }
 
   </style>
 </head>
@@ -566,8 +511,8 @@
 
   <div class="page">
     <div class="page-header">
-      <div class="page-title">Chromesthetic Canvas</div>
-      <div class="page-subtitle">painting with sound &mdash; listening to color</div>
+      <div class="page-title">Musical Canvas</div>
+      <div class="page-subtitle"> ¿ turn art into music ¿ </div>
     </div>
 
     <div class="tab-bar">
@@ -586,8 +531,8 @@
         <div class="ctrl-group">
           <div class="ctrl-label">tool</div>
           <div class="tool-row">
-            <div class="tool-btn active" id="tool-brush" data-tool="brush">✏️ brush</div>
-            <div class="tool-btn"        id="tool-eraser" data-tool="eraser">⬜ erase</div>
+            <div class="tool-btn active" id="tool-brush" data-tool="brush">¿ brush</div>
+            <div class="tool-btn"        id="tool-eraser" data-tool="eraser"> ¿ erase</div>
           </div>
         </div>
 
@@ -662,226 +607,56 @@
       <span class="status" id="status">draw to begin</span>
       <span class="stroke-tally" id="tally"></span>
     </div>
-    </div><!-- end panel-canvas -->
+    </div>
 
-    <!-- ── Proposal panel ── -->
+    <!-- ── Proposal Tab ── -->
     <div class="tab-panel" id="panel-proposal">
       <div class="prose-panel">
-        <h1>Chromesthetic Canvas</h1>
+        <h1>Musical Canvas</h1>
         <p class="meta">Final Project Proposal &nbsp;|&nbsp; WebAudio &nbsp;|&nbsp; Digital Signal Processing</p>
-
-        <h2>Project Overview</h2>
-        <p>Chromesthesia is the neurological phenomenon where auditory stimuli involuntarily trigger color perception. This project inverts it: you paint on a canvas with gestures, and those gestures generate sound in real time. The canvas becomes simultaneously an instrument, a score, and a visual artwork.</p>
-        <p>Every brushstroke is a musical event. The finished painting is also a finished performance. The core design constraint is that color cannot be chosen directly — it is derived entirely from the sound parameters you create, making the visual palette a byproduct of musical decisions.</p>
-
-        <h2>Conceptual Grounding</h2>
-        <p>The project draws on two ideas in dialogue:</p>
-        <ul>
-          <li><strong>FM synthesis as expressive gesture.</strong> The carrier/modulator relationship governs timbre. Rather than setting FM parameters numerically, the user sets them spatially and kinetically — where you draw and how fast become the compositional act.</li>
-          <li><strong>The graphic score tradition</strong> (Earle Brown, Cornelius Cardew). These composers created visual artifacts meant to be interpreted as music. This project generates both artifacts simultaneously and deterministically from the same source.</li>
-        </ul>
-
-        <h2>Gesture-to-Sound-to-Color Mapping</h2>
-        <table>
-          <tr><th>Canvas gesture</th><th>WebAudio parameter</th><th>Visual output</th></tr>
-          <tr><td>Pointer x-position</td><td>Carrier frequency (100–2000 Hz, log scale)</td><td>Stroke hue (maps to musical pitch region)</td></tr>
-          <tr><td>Pointer y-position</td><td>FM modulation index via GainNode (0–10)</td><td>Stroke saturation (pure → complex timbre)</td></tr>
-          <tr><td>Pointer velocity</td><td>Amplitude envelope attack time (1ms–500ms)</td><td>Stroke opacity (fast = opaque, slow = translucent)</td></tr>
-          <tr><td>Stroke width (slider)</td><td>Convolution reverb send level (dry/wet 0–1)</td><td>Stroke line width (spacious sound = thick stroke)</td></tr>
-          <tr><td>Carrier:modulator ratio</td><td>Determines harmonic spectrum (integer = tonal)</td><td>Stroke hue offset (inharmonic = shifted color)</td></tr>
-        </table>
-
-        <h2>Technical Architecture</h2>
-        <p>Each pointer stroke spawns one polyphonic FM voice, capped at 8 simultaneous voices. Voices are managed as JavaScript objects with explicit lifecycle methods (start, release, dispose).</p>
-        <p><strong>Signal chain per voice:</strong></p>
-        <div class="signal-chain">
-          OscillatorNode (modulator) → GainNode (mod index, driven by y-position) → OscillatorNode (carrier, driven by x-position)<br>
-          Carrier output → GainNode (amplitude envelope, driven by velocity) → dry/wet split<br>
-          Dry → masterGain → AnalyserNode → AudioContext.destination<br>
-          Wet → ConvolverNode (reverb, driven by stroke width) → masterGain
-        </div>
-        <p><strong>Color derivation:</strong></p>
-        <ul>
-          <li><strong>Hue:</strong> derived logarithmically from carrier frequency (left = warm/low pitch, right = cool/high pitch); inharmonic ratios shift hue further.</li>
-          <li><strong>Saturation:</strong> maps from modulation index (0 = gray/pure sine, 75% = pastel/complex).</li>
-          <li><strong>Lightness:</strong> maps from instantaneous amplitude (quiet = darker; loud = brighter). Held in pastel range (68–82%).</li>
-        </ul>
-
-        <h2>Rubric Alignment</h2>
-        <table>
-          <tr><th>Criterion</th><th>Pts</th><th>How This Project Meets It</th></tr>
-          <tr><td>Concept from class</td><td>4</td><td>FM synthesis — x-axis maps carrier frequency, y-axis maps modulation index. The GainNode-as-modulation-index pattern is applied directly as the core musical engine.</td></tr>
-          <tr><td>Code technique from class</td><td>4</td><td>GainNode controlling FM modulation index in real time, driven by canvas pointer y-position. OscillatorNode frequency automation via AudioParam.setTargetAtTime.</td></tr>
-          <tr><td>Topic not covered in class</td><td>4</td><td>Convolution reverb from a procedurally generated impulse response; pointer velocity mapped to envelope attack time; HSL color derived algorithmically from FM parameters.</td></tr>
-          <tr><td>Code quality</td><td>2</td><td>No copy-paste. Module pattern (AudioEngine, DrawCanvas, StrokeStore, etc.). Well-named variables. Functions under 20 lines.</td></tr>
-          <tr><td>Above and beyond</td><td>4</td><td>Replay system: strokes serialized with timestamps and FM parameters. Playback redraws the canvas and re-triggers audio in perfect sync — the painting performs itself as a deterministic concert.</td></tr>
-        </table>
-
-        <h2>Above and Beyond: the Replay System</h2>
-        <p>As the user draws, every stroke is recorded as a plain JavaScript object containing path points, FM parameters, color, line weight, and a timestamp relative to session start. When the user hits Replay, the canvas clears and redraws each stroke at the original timestamp offset, while the audio engine re-fires the corresponding FM voice with identical parameters.</p>
-        <p>This transforms the project from an instrument into a notation system. Each session produces a unique, reproducible artwork-performance pair. If the painting and the music are the same thing — which one is the score?</p>
-
-        <h2>Scope &amp; Feasibility</h2>
-        <table>
-          <tr><th>Phase</th><th>Days</th><th>Deliverable</th></tr>
-          <tr><td>1</td><td>1–2</td><td>FM voice factory + polyphonic engine (8-voice cap). Silent canvas with pointer tracking.</td></tr>
-          <tr><td>2</td><td>3–4</td><td>Audio↔visual binding: HSL color derived from FM params, live stroke rendering synchronized to audio events.</td></tr>
-          <tr><td>3</td><td>5</td><td>ConvolverNode reverb send + stroke width mapping. Tuning of frequency range and mod index feel.</td></tr>
-          <tr><td>4</td><td>6–7</td><td>Replay system: stroke serialization, timestamp-accurate audio + canvas playback.</td></tr>
-          <tr><td>5</td><td>8</td><td>Polish, code review, comments, variable naming pass. Demo recording.</td></tr>
-        </table>
+        
+        <p>blah</p>
+        
       </div>
-    </div><!-- end panel-proposal -->
+    </div>
 
-    <!-- ── Presentation panel ── -->
+    <!-- ── Presentation Tab ── -->
     <div class="tab-panel" id="panel-presentation">
-      <div class="slides-panel">
-
-        <div class="slide slide-title">
-          <h2>Chromesthetic Canvas</h2>
-          <p>Painting with Sound &mdash; Listening to Color</p>
-          <p style="font-size:13px;margin-top:10px;color:#9a8060;">WebAudio Final Project &nbsp;·&nbsp; Digital Signal Processing</p>
+      <div class="video-panel">
+        <div class="video-placeholder">
+          <div class="video-placeholder-inner">
+            <div class="video-icon">▶</div>
+            <p>demo video</p>
+          </div>
         </div>
-
-        <div class="slide">
-          <div class="slide-num">01</div>
-          <h3>What is Chromesthesia?</h3>
-          <p>A neurological phenomenon where sound involuntarily triggers color perception. Some people see colors when they hear music.</p>
-          <p style="margin-top:8px;">This project <strong>inverts</strong> it: drawing generates sound, and sound generates color.</p>
-        </div>
-
-        <div class="slide">
-          <div class="slide-num">02</div>
-          <h3>The Core Constraint</h3>
-          <p>Color <em>cannot</em> be chosen directly.</p>
-          <p style="margin-top:6px;">It is derived entirely from the sound parameters you create while drawing. The visual palette is a byproduct of musical decisions.</p>
-        </div>
-
-        <div class="slide wide">
-          <div class="slide-num">03</div>
-          <h3>Gesture → Sound → Color Mapping</h3>
-          <div class="mapping-row"><span class="mapping-left">x position</span><span class="mapping-arrow">→</span><span class="mapping-right">carrier frequency (100–2000 Hz, log) → hue</span></div>
-          <div class="mapping-row"><span class="mapping-left">y position</span><span class="mapping-arrow">→</span><span class="mapping-right">FM modulation index (0–10) → saturation</span></div>
-          <div class="mapping-row"><span class="mapping-left">pointer speed</span><span class="mapping-arrow">→</span><span class="mapping-right">envelope attack time (1–400 ms) → opacity</span></div>
-          <div class="mapping-row"><span class="mapping-left">reverb slider</span><span class="mapping-arrow">→</span><span class="mapping-right">convolution reverb wet/dry → stroke weight</span></div>
-          <div class="mapping-row"><span class="mapping-left">C:M ratio</span><span class="mapping-arrow">→</span><span class="mapping-right">harmonic spectrum (integer = tonal) → hue shift</span></div>
-        </div>
-
-        <div class="slide">
-          <div class="slide-num">04</div>
-          <h3>FM Signal Chain</h3>
-          <p style="font-size:12px;font-family:monospace;line-height:2;color:#3a4a58;">
-            modOsc → modGain<br>
-            modGain → carrierOsc.frequency<br>
-            carrierOsc → ampGain<br>
-            ampGain → dry → masterGain<br>
-            ampGain → wet → convolver → masterGain<br>
-            masterGain → analyser → out
-          </p>
-        </div>
-
-        <div class="slide">
-          <div class="slide-num">05</div>
-          <h3>Pastel Color Derivation</h3>
-          <ul>
-            <li><strong>Hue</strong> — log-mapped from carrier frequency across 300° of spectrum</li>
-            <li><strong>Saturation</strong> — FM modulation index × 3 + 45 (45–75%)</li>
-            <li><strong>Lightness</strong> — amplitude reading from AnalyserNode (68–82%)</li>
-          </ul>
-          <p style="margin-top:8px;font-size:13px;color:#7a6848;">All three channels are byproducts of sound — never set directly.</p>
-        </div>
-
-        <div class="slide">
-          <div class="slide-num">06</div>
-          <h3>Not Covered in Class</h3>
-          <ul>
-            <li>Convolution reverb via <strong>procedurally generated impulse response</strong> (decaying white noise buffer)</li>
-            <li>Pointer <strong>velocity → attack time</strong> inverse mapping</li>
-            <li>Bidirectional audio ↔ visual feedback loop</li>
-          </ul>
-        </div>
-
-        <div class="slide">
-          <div class="slide-num">07</div>
-          <h3>The Replay System</h3>
-          <p>Every stroke is serialized: <code style="font-size:12px;">{ path, carrierFreq, modIndex, ratio, color, relTime, duration }</code></p>
-          <p style="margin-top:8px;">Replay clears the canvas and re-animates each stroke at its original timestamp while re-firing the exact FM voice. The painting paints itself while playing itself.</p>
-        </div>
-
-        <div class="slide">
-          <div class="slide-num">08</div>
-          <h3>Concepts from Class Applied</h3>
-          <ul>
-            <li><strong>FM synthesis</strong> — GainNode as modulation depth (modFreq × modIndex)</li>
-            <li><strong>AudioParam.setTargetAtTime</strong> — exponential amplitude envelopes</li>
-            <li><strong>AnalyserNode</strong> — real-time amplitude metering for color brightness</li>
-            <li><strong>Polyphony management</strong> — 8-voice cap with FIFO eviction</li>
-          </ul>
-        </div>
-
       </div>
-    </div><!-- end panel-presentation -->
+    </div>
 
-    <!-- ── Writeup panel ── -->
+    <!-- ── Writeup Tab ── -->
     <div class="tab-panel" id="panel-writeup">
       <div class="prose-panel">
-        <h1>Technical Writeup</h1>
-        <p class="meta">Chromesthetic Canvas &nbsp;|&nbsp; WebAudio Final Project</p>
+        <h1>Writeup</h1>
+        <p class="meta">Musical Canvas | Computational Sound Final Project</p>
 
-        <h2>Concept</h2>
-        <p>The central question driving this project was: what would it look like if a painting and a musical performance were literally the same object? Not one illustrating the other, but both emerging deterministically from a single source — the gesture of drawing.</p>
-        <p>Chromesthesia provided the conceptual frame. In people with this form of synesthesia, sounds produce involuntary color experiences. The project inverts the direction: drawing produces sound, and those sound parameters produce color. The user never chooses a color or a note directly. Both emerge from a single physical act.</p>
+        <p>blah</p>
 
-        <h2>FM Synthesis as the Core Engine</h2>
-        <p>FM synthesis was chosen because it produces a wide range of timbres from a compact set of parameters — carrier frequency, modulator frequency, and modulation index. This maps cleanly onto a two-dimensional canvas: x-position controls carrier frequency on a logarithmic scale (100–2000 Hz), and y-position controls the modulation index via a GainNode. This is the GainNode-as-modulation-index pattern from class, applied directly as the compositional interface.</p>
-        <p>The modulation depth follows the standard FM formula: <code>depth = modulatorFreq × modIndex</code>. As you draw upward (toward lower y values), the modulation index rises, adding overtones and harmonic complexity to the sound. Drawing downward produces a pure sine tone. This gives the vertical axis a direct perceptual meaning: high on the page sounds metallic and complex; low on the page sounds smooth and pure.</p>
-
-        <h2>Envelope and Velocity</h2>
-        <p>Pointer velocity is mapped inversely to amplitude envelope attack time using <code>AudioParam.setTargetAtTime</code>. A fast stroke produces a short attack — the sound snaps in percussively. A slow stroke produces a long attack — the sound swells in gently. This is not covered in class and required working out the inverse mapping: <code>attackTime = 400 / (velocity × 18 + 1)</code> milliseconds, clamped to a minimum of 2ms.</p>
-        <p>This means that the speed of your gesture has a direct, audible consequence — which in turn affects stroke opacity in the auto-color mode, since opacity is tied to amplitude at the moment of stroke creation.</p>
-
-        <h2>Convolution Reverb</h2>
-        <p>Each voice routes through a shared ConvolverNode loaded with a procedurally generated impulse response. The impulse is two seconds of exponentially decaying white noise, created at runtime using <code>AudioContext.createBuffer</code>. The reverb send level is controlled by the slider in the margin, which also scales the stroke line weight — a spacious, wet sound produces a thicker line. This bidirectional mapping is not covered in class.</p>
-
-        <h2>Color Derivation</h2>
-        <p>Color is computed entirely from FM parameters and may never be set directly by the user in auto mode. Hue is log-mapped from carrier frequency across 300 degrees of the HSL spectrum, so drawing from left to right sweeps from orange through green, blue, and into purple — the same direction as pitch rising. The carrier-to-modulator ratio shifts hue further: inharmonic ratios (fractional values like 1.5 or 2.7) add up to 60 degrees of cool shift, while integer ratios (1, 2, 3) leave the hue unshifted. Saturation comes from the modulation index, and lightness is sampled from the AnalyserNode's frequency data at the moment of stroke creation.</p>
-        <p>All colors are kept in the pastel range (lightness 68–82%, saturation 45–75%) so the canvas reads as a coherent artwork rather than a stress test of the color gamut.</p>
-
-        <h2>The Replay System</h2>
-        <p>Every completed brush stroke is serialized into a plain JavaScript object containing the full path array, all FM parameters, the computed color, line weight, and a timestamp relative to the session start. When the user hits Replay, the canvas clears and each stroke is re-scheduled with <code>setTimeout</code> at its original relative timestamp. The FM voice for that stroke re-fires with identical parameters, and the path is re-animated segment by segment across the stroke's original duration.</p>
-        <p>The result is a deterministic performance: the painting paints itself while playing itself. This transforms the canvas from an instrument into a notation system. The question the project is designed to leave open: if the painting and the music are the same thing, which one is the score?</p>
-
-        <h2>Code Structure</h2>
-        <p>The implementation is organized into self-contained modules using the revealing module pattern:</p>
-        <ul>
-          <li><strong>AudioEngine</strong> — FM voice factory, shared reverb and analyser bus, FIFO voice eviction at the 8-voice cap.</li>
-          <li><strong>BgCanvas</strong> — static ruled-paper background, drawn once and never touched by user interaction.</li>
-          <li><strong>DrawCanvas</strong> — receives strokes additively; eraser uses <code>destination-out</code> compositing to punch holes, revealing the background layer beneath.</li>
-          <li><strong>StrokeStore</strong> — append-only array of serialized strokes with relative timestamps.</li>
-          <li><strong>InputHandler</strong> — translates pointer events into FM parameters and canvas paint calls; skips audio for the eraser tool.</li>
-          <li><strong>ReplayEngine</strong> — schedules audio and canvas animation from the stroke store; cancels all timeouts cleanly on stop.</li>
-        </ul>
-
-        <h2>Reflection</h2>
-        <p>The hardest part of the project was not the WebAudio implementation — the FM chain is relatively straightforward once the parameter mappings are decided. The hard part was designing the mappings themselves so that they feel natural while drawing. Several iterations were needed: the first version used linear frequency scaling, which made the left quarter of the canvas sound identical and the right quarter feel impossibly high. Switching to a logarithmic scale (matching how human pitch perception works) made the canvas feel playable across its full width.</p>
-        <p>The replay system was the most satisfying feature to build. Watching the canvas repaint itself while the corresponding sounds re-emerge makes clear in a way that no explanation can that the image and the music really are the same object. The painting is a score. The score is a painting.</p>
       </div>
-    </div><!-- end panel-writeup -->
+    </div>
 
-  </div><!-- end .page -->
-</div><!-- end .notebook -->
+  </div>
+</div>
 
 <script>
 'use strict';
 
-// ── Constants ──────────────────────────────────────────────────────────────
+// ── Constants 
 const MAX_VOICES = 8;
 const FREQ_MIN   = 100;
 const FREQ_MAX   = 2000;
 const LINE_GAP   = 28;
 const BG_COLOR   = '#faf7ee';
 
-// ── AudioEngine ────────────────────────────────────────────────────────────
+// ── AudioEngine 
 const AudioEngine = (() => {
   let ctx, convolver, analyser, masterGain;
   const voices     = new Map();

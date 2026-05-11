@@ -2,20 +2,30 @@
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 function play() {
-    // console.log("Babbling Brook");
 
-    var bufferSize = 10 * audioCtx.sampleRate;
-    noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-    output = noiseBuffer.getChannelData(0);
+    //Provided Brown Noise code
+    const bufferSize = 10 * audioCtx.sampleRate;
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const output = buffer.getChannelData(0);
 
-    var lastOut = 0;
-    for (var i = 0; i < bufferSize; i++) {
-        var brown = Math.random() * 2 - 1;
-    
-        output[i] = (lastOut + (0.02 * brown)) / 1.02;
+    let lastOut = 0;
+
+    for (let i = 0; i < bufferSize; i++) {
+        const brown = Math.random() * 2 - 1;
+        output[i] = (lastOut + 0.02 * brown) / 1.02;
         lastOut = output[i];
+
         output[i] *= 3.5;
     }
+
+    var brownNoise = audioCtx.createBufferSource();
+    brownNoise.buffer = buffer;
+    brownNoise.loop = true;
+    brownNoise.start();
+
+    // const src = audioCtx.createBufferSource();
+    // src.buffer = buffer;
+    // src.loop = true;
 
     const mainGain = audioCtx.createGain();
     mainGain.gain.value = 0.2;
@@ -30,22 +40,17 @@ function play() {
     
     // * 400
     const lpf2_gain = audioCtx.createGain();
-    lpf2_gain.gain.value = 1000; //400 sounded to windy --> higher values created a greate rbubblling noise
+    lpf2_gain.gain.value = 1000; //400 sounded to windy --> higher values created a greater bubblling noise
     
     // + 500
     const offset = audioCtx.createConstantSource();
-    offset.offset.value = 500; //500 sounded weird
+    offset.offset.value = 100; //decreaed for less "whistling noise" 
     offset.start();
 
     //rhpf
     const rhpf = audioCtx.createBiquadFilter();
     rhpf.type = 'highpass';
     rhpf.Q.value = 1/0.03;
-
-    var brownNoise = audioCtx.createBufferSource();
-    brownNoise.buffer = noiseBuffer;
-    brownNoise.loop = true;
-    brownNoise.start();
     
     brownNoise.connect(lpf1).connect(rhpf);
 
@@ -56,5 +61,5 @@ function play() {
 }
 
 document.getElementById("play-button").addEventListener("click", () => {
-    audioCtx.resume().then(play);
+    play();
 });
